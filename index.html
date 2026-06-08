@@ -551,20 +551,29 @@ const TOTAL_FIGURINHAS = 41;
 // ---- DB helpers ----
 async function db(path, opts = {}) {
   const url = SUPABASE_URL + '/rest/v1/' + path;
-  const res = await fetch(url, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || '',
-      ...opts.headers
-    },
-    method: opts.method || 'GET',
-    body: opts.body ? JSON.stringify(opts.body) : undefined
-  });
-  if (opts.noparse) return res;
-  const text = await res.text();
-  try { return text ? JSON.parse(text) : []; } catch(e) { return []; }
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': opts.prefer || '',
+        ...opts.headers
+      },
+      method: opts.method || 'GET',
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    if (opts.noparse) return res;
+    const text = await res.text();
+    if (!res.ok) {
+      console.error('DB error', res.status, path, text);
+      return opts.method && opts.method !== 'GET' ? null : [];
+    }
+    try { return text ? JSON.parse(text) : []; } catch(e) { return []; }
+  } catch(e) {
+    console.error('Fetch error:', e, url);
+    throw e;
+  }
 }
 
 // simple hash (not cryptographic, ok for internal game)
@@ -649,6 +658,8 @@ async function tryRegister() {
   if (result && result[0] && result[0].id) {
     CURRENT_USER = result[0];
     localStorage.setItem('bf_user_id', CURRENT_USER.id);
+    // Load missoes before completing mission
+    ALL_MISSOES = await db('missoes?select=*&ativa=eq.true&order=id') || [];
     await completeMissao('cadastro');
     await initApp();
   } else {
