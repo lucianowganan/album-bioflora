@@ -643,7 +643,7 @@ async function tryRegister() {
 
   $('reg-btn').disabled = true;
   // check if name already exists
-  const existing = await db('usuarios?nome_completo=eq.' + encodeURIComponent(nome) + '&select=id');
+  const existing = await db('usuarios?select=id&nome_completo=eq.' + encodeURIComponent(nome));
   if (existing && existing.length > 0) {
     $('reg-error').textContent = 'Esse nome já está cadastrado';
     $('reg-btn').disabled = false; return;
@@ -676,7 +676,7 @@ async function tryLogin() {
   if (!nome || !senha) { $('log-error').textContent = 'Preencha todos os campos'; return; }
   $('log-btn').disabled = true;
 
-  const users = await db('usuarios?nome_completo=eq.' + encodeURIComponent(nome) + '&select=*');
+  const users = await db('usuarios?select=*&nome_completo=eq.' + encodeURIComponent(nome));
   if (!users || users.length === 0) {
     $('log-error').textContent = 'Usuário não encontrado'; $('log-btn').disabled = false; return;
   }
@@ -703,23 +703,14 @@ async function initApp() {
   showLoading(true);
   try {
     // Load all data in parallel
-    const [figurinhas, colecao, users, missoes, missComp, trocasRec, trocasEnv] = await Promise.all([
-      db('figurinhas?select=*&order=numero_album'),
-      db('colecao?usuario_id=eq.' + CURRENT_USER.id + '&select=*,figurinhas(*)'),
-      db('usuarios?select=id,nome_completo,setor,is_admin,penalidade_ate,pacotes_disponiveis&order=nome_completo'),
-      db('missoes?select=*&ativa=eq.true&order=id'),
-      db('missoes_completadas?usuario_id=eq.' + CURRENT_USER.id + '&select=*,missoes(*)'),
-      db('trocas?destinatario_id=eq.' + CURRENT_USER.id + '&status=eq.pendente&select=*,figurinhas!trocas_figurinha_oferecida_fkey(*),figurinhas!trocas_figurinha_desejada_fkey(*),usuarios!trocas_solicitante_id_fkey(nome_completo)'),
-      db('trocas?solicitante_id=eq.' + CURRENT_USER.id + '&status=eq.pendente&select=*,figurinhas!trocas_figurinha_oferecida_fkey(*),figurinhas!trocas_figurinha_desejada_fkey(*),usuarios!trocas_destinatario_id_fkey(nome_completo)')
-    ]);
-
-    ALL_FIGURINHAS = figurinhas || [];
-    USER_COLECAO = colecao || [];
-    ALL_USERS = users || [];
-    ALL_MISSOES = missoes || [];
-    MISSOES_COMPLETADAS = missComp || [];
-    TROCAS_RECEBIDAS = trocasRec || [];
-    TROCAS_ENVIADAS = trocasEnv || [];
+    // Load data sequentially to avoid parallel failures
+    ALL_FIGURINHAS = await db('figurinhas?select=*&order=numero_album') || [];
+    USER_COLECAO = await db('colecao?select=*,figurinhas(*)&usuario_id=eq.' + CURRENT_USER.id) || [];
+    ALL_USERS = await db('usuarios?select=id,nome_completo,setor,is_admin,penalidade_ate,pacotes_disponiveis&order=nome_completo') || [];
+    ALL_MISSOES = await db('missoes?select=*&order=id&ativa=eq.true') || [];
+    MISSOES_COMPLETADAS = await db('missoes_completadas?select=*,missoes(*)&usuario_id=eq.' + CURRENT_USER.id) || [];
+    TROCAS_RECEBIDAS = await db('trocas?select=*&destinatario_id=eq.' + CURRENT_USER.id + '&status=eq.pendente') || [];
+    TROCAS_ENVIADAS = await db('trocas?select=*&solicitante_id=eq.' + CURRENT_USER.id + '&status=eq.pendente') || [];
 
     // Check and grant daily pack
     await checkDailyPack();
@@ -894,9 +885,10 @@ async function doReveal() {
     const rb = fig.raridade.charAt(0);
     el.className = 'rcard b' + rb;
 
-    if (fig.imagem_url || FIGS[fig.nome.toLowerCase().replace(/\s/g,'').replace(/[^a-z]/g,'')]) {
-      const imgKey = fig.nome.toLowerCase().replace(/\s/g,'').replace(/[^a-z]/g,'');
-      const imgSrc = fig.imagem_url || FIGS[imgKey] || null;
+    const _metaEntry = META.find(m => m[5] == fig.numero_album);
+    const _figKey = _metaEntry ? _metaEntry[0] : null;
+    if (fig.imagem_url || (_figKey && FIGS[_figKey])) {
+      const imgSrc = fig.imagem_url || FIGS[_figKey] || null;
       if (imgSrc) {
         const img = document.createElement('img');
         img.src = imgSrc;
@@ -1038,7 +1030,7 @@ const ALBUM_PAGES = [
   { id:'colab', label:'Colaboradores', cat:'Equipe Bioflora', filter: f => f.categoria === 'colaboradores' },
   { id:'legends', label:'Lendárias', cat:'Chefes & Fundadoras', filter: f => f.categoria === 'lendarias' },
   { id:'epics', label:'Épicas', cat:'Legends — 10+ anos', filter: f => f.categoria === 'epicas' },
-  { id:'spec', label:'Especiais', cat:'Mascotes & Troféus', filter: f => ['especiais','mascotes'].includes(f.categoria) }
+  { id:'spec', label:'Especiais', cat:'Mascotes & Troféus', filter: f => f.categoria === 'especiais' }
 ];
 
 function buildAlbum() {
@@ -1060,8 +1052,8 @@ function buildAlbum() {
         const userFig = USER_COLECAO.find(c => c.figurinha_id === fig.id && c.colada);
         slot.className = 'slot' + (userFig ? ' filled ' + fig.raridade : '');
         if (userFig) {
-          const imgKey = fig.nome.toLowerCase().replace(/\s/g,'').replace(/[^a-z]/g,'');
-          const imgSrc = fig.imagem_url || FIGS[imgKey] || null;
+          const _me = META.find(m => m[5] == fig.numero_album);
+          const imgSrc = fig.imagem_url || (_me ? FIGS[_me[0]] : null);
           if (imgSrc) {
             const img = document.createElement('img'); img.src = imgSrc; slot.appendChild(img);
           } else {
@@ -1121,8 +1113,8 @@ function renderInventory() {
   items.forEach(item => {
     const fig = item.figurinhas;
     const row = document.createElement('div'); row.className = 'irow';
-    const imgKey = fig.nome.toLowerCase().replace(/\s/g,'').replace(/[^a-z]/g,'');
-    const imgSrc = fig.imagem_url || FIGS[imgKey] || null;
+    const _mi = META.find(m => m[5] == fig.numero_album);
+    const imgSrc = fig.imagem_url || (_mi ? FIGS[_mi[0]] : null);
     const thumbHtml = imgSrc ? `<img src="${imgSrc}" onerror="this.style.display='none'">` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:20px">${rarityEmoji(fig.raridade)}</div>`;
     const tradeBtn = item.quantidade > 1 ? '<button class="tbtn" data-fig-id="' + fig.id + '">Trocar</button>' : '';
     row.innerHTML = `<div class="ithumb">${thumbHtml}</div><div class="rdot rc-${fig.raridade}"></div><div style="flex:1"><div class="iname">${fig.nome}</div><div class="irole">${fig.cargo}</div></div><div style="text-align:right;margin-right:6px"><div class="icnt">${item.quantidade}x</div><div class="icl">cópias</div></div>${tradeBtn}`;
@@ -1215,8 +1207,8 @@ function renderRepeatList() {
     const card = document.createElement('div');
     card.className = 'sel-card' + (selectedRepeat === fig.id ? ' chosen' : '');
     card.dataset.figId = fig.id;
-    const imgKey = fig.nome.toLowerCase().replace(/\s/g,'').replace(/[^a-z]/g,'');
-    const imgSrc = fig.imagem_url || FIGS[imgKey] || null;
+    const _mi = META.find(m => m[5] == fig.numero_album);
+    const imgSrc = fig.imagem_url || (_mi ? FIGS[_mi[0]] : null);
     const thumbHtml = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:56px;object-fit:cover;border-radius:5px">` : `<div style="width:40px;height:56px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--wine-card);border-radius:5px">${rarityEmoji(fig.raridade)}</div>`;
     card.innerHTML = `${thumbHtml}<div class="rdot rc-${fig.raridade}"></div><div style="flex:1"><div class="iname">${fig.nome}</div><div class="irole">${fig.cargo} · ${item.quantidade}x</div></div>`;
     card.onclick = () => {
