@@ -18,7 +18,40 @@
   --green:#4CAF50;--red:#e53935;
 }
 html,body{height:100%;background:var(--wine-bg);font-family:"Maven Pro",sans-serif;color:var(--white);overflow:hidden;touch-action:manipulation}
+body{display:flex;align-items:center;justify-content:center;}
 #app{width:100%;max-width:430px;height:100dvh;min-height:600px;position:relative;overflow:hidden;margin:0 auto;background:var(--wine-bg)}
+
+/* Tablet e Desktop */
+@media(min-width:600px){
+  body{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a0510,#0e0208);}
+  #app{border-radius:20px;box-shadow:0 20px 80px rgba(0,0,0,0.8);height:min(100dvh,820px);max-width:480px;}
+}
+@media(min-width:1024px){
+  #app{max-width:420px;height:min(100dvh - 40px,860px);}
+  body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(140,24,58,0.15),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(46,15,30,0.3),transparent 60%);pointer-events:none;}
+}
+@media(min-width:1200px){
+  body{gap:40px;}
+  .desktop-sidebar{display:flex!important;}
+}
+
+/* Desktop sidebar info panel */
+.desktop-sidebar{
+  display:none;
+  flex-direction:column;
+  gap:16px;
+  width:280px;
+  flex-shrink:0;
+}
+.ds-card{background:rgba(36,8,20,0.7);border:1px solid rgba(201,168,76,0.12);border-radius:16px;padding:20px;}
+.ds-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(201,168,76,0.5);margin-bottom:10px;}
+.ds-stat{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.ds-stat:last-child{border:none;}
+.ds-ico{font-size:18px;width:28px;text-align:center;}
+.ds-info{flex:1;}
+.ds-label{font-size:10px;color:rgba(245,240,235,0.4);text-transform:uppercase;font-weight:700;}
+.ds-val{font-size:14px;font-weight:800;color:var(--white);}
+
 
 /* ===== AUTH SCREENS ===== */
 .auth-screen{position:absolute;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#3a0820,var(--wine-bg) 55%,#0e0208);padding:24px}
@@ -261,6 +294,19 @@ html,body{height:100%;background:var(--wine-bg);font-family:"Maven Pro",sans-ser
 </style>
 </head>
 <body>
+<div style="display:contents" id="app-wrapper">
+<div class="desktop-sidebar" id="desktop-sidebar">
+  <div class="ds-card">
+    <div class="ds-title">Seleção Bioflora 2026</div>
+    <div class="ds-stat"><div class="ds-ico">📖</div><div class="ds-info"><div class="ds-label">Figurinhas</div><div class="ds-val" id="ds-collected">—</div></div></div>
+    <div class="ds-stat"><div class="ds-ico">🏆</div><div class="ds-info"><div class="ds-label">Ranking</div><div class="ds-val" id="ds-rank">—</div></div></div>
+    <div class="ds-stat"><div class="ds-ico">📦</div><div class="ds-info"><div class="ds-label">Pacotes</div><div class="ds-val" id="ds-packs">—</div></div></div>
+  </div>
+  <div class="ds-card">
+    <div class="ds-title">Próxima meta</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.5" id="ds-next-goal">Carregando...</div>
+  </div>
+</div>
 <div id="app">
 
   <!-- LOADING GLOBAL -->
@@ -724,6 +770,25 @@ function renderHome(){
   else $('home-next-goal').textContent='Incrível! Quase lá!';
   renderMissionsPreview();
   renderRankBadge();
+  updateDesktopSidebar();
+}
+
+function updateDesktopSidebar(){
+  var ds=$('desktop-sidebar');
+  if(!ds||ds.style.display==='none')return;
+  var collected=USER_COLECAO.filter(function(c){return c.colada;}).length;
+  var packs=CURRENT_USER.pacotes_disponiveis||0;
+  var dsc=$('ds-collected');if(dsc)dsc.textContent=collected+'/36';
+  var dsp=$('ds-packs');if(dsp)dsp.textContent=packs+' disponível'+(packs!==1?'is':'');
+  var dsn=$('ds-next-goal');
+  if(dsn){
+    var pct=Math.round((collected/36)*100);
+    if(pct<25)dsn.textContent='Complete 25% do álbum para ganhar +2 pacotes';
+    else if(pct<50)dsn.textContent='Complete 50% para +1 pacote';
+    else if(pct<75)dsn.textContent='Complete 75% para +2 pacotes';
+    else if(pct<100)dsn.textContent='Quase lá! Complete o álbum para ganhar R$200!';
+    else dsn.textContent='Álbum completo! Fale com a Wal para resgatar o prêmio.';
+  }
 }
 
 async function renderRankBadge(){
@@ -733,6 +798,7 @@ async function renderRankBadge(){
   var sorted=Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
   var myRank=sorted.findIndex(function(x){return x[0]===CURRENT_USER.id;})+1;
   $('stat-rank').textContent=myRank>0?myRank+'°':'1°';
+  var dsr=$('ds-rank');if(dsr)dsr.textContent=myRank>0?myRank+' lugar':'1 lugar';
 }
 
 function renderMissionsPreview(){
@@ -762,8 +828,14 @@ async function startOpen(){
   packOpening=true;
   $('obtn').disabled=true;
   // Decrement BEFORE opening to prevent spam
-  var ok=await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:packs-1}});
+  await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:packs-1}});
   CURRENT_USER.pacotes_disponiveis=packs-1;
+  // Double-check: verify pack was actually decremented in DB
+  var verify=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=pacotes_disponiveis');
+  if(verify&&verify[0]&&verify[0].pacotes_disponiveis>=packs){
+    // DB didn't update, force it
+    await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:packs-1}});
+  }
   $('overlay').classList.add('show');
   $('pphase').style.display='flex';
   $('rphase').classList.remove('show');
@@ -812,7 +884,9 @@ async function doReveal(){
   }
   await db('pacotes',{method:'POST',body:{usuario_id:CURRENT_USER.id,figurinhas_obtidas:pack.map(function(f){return f.id;}),origem:'diario'}});
   await checkAutoMissions();
-  $('pavail').textContent=CURRENT_USER.pacotes_disponiveis+' pacote'+(CURRENT_USER.pacotes_disponiveis!==1?'s':'')+' disponível'+(CURRENT_USER.pacotes_disponiveis!==1?'is':'');
+  var p=CURRENT_USER.pacotes_disponiveis;
+  $('pavail').textContent=p>0?p+' pacote'+(p!==1?'s':'')+' disponível'+(p!==1?'is':''):'Nenhum pacote disponível';
+  $('obtn').disabled=p<=0;
 }
 
 function rarityEmoji(r){return {comum:'👤',rara:'🥉',epica:'🥈',lendaria:'👑',especial:'🌟'}[r]||'👤';}
@@ -847,8 +921,8 @@ function generatePack(){
 async function closeOv(){
   $('overlay').classList.remove('show');
   packOpening=false;
-  var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=*');
-  if(fresh&&fresh[0])CURRENT_USER=fresh[0];
+  // Don't re-fetch user here — pack count was already decremented in startOpen
+  // Re-fetching can return stale data and restore the pack count
   USER_COLECAO=await db('colecao?select=*,figurinhas(*)&usuario_id=eq.'+CURRENT_USER.id)||[];
   renderHome();buildAlbum();renderInventory();renderGoals();
 }
