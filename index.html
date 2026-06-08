@@ -452,6 +452,7 @@ body{display:flex;align-items:center;justify-content:center;}
             <select class="adm-select" id="trade-want-sel"><option value="">Selecionar figurinha desejada...</option></select>
             <div style="font-size:11px;color:var(--muted);margin:8px 0;font-weight:600">Enviar proposta para:</div>
             <select class="adm-select" id="trade-target-sel"><option value="">Selecionar colaborador...</option></select>
+            <div id="trade-validation-hint" style="font-size:11px;font-weight:700;min-height:16px;margin-top:4px"></div>
             <button class="obtn" id="send-trade-btn" style="font-size:13px;margin-top:8px">Enviar Proposta</button>
           </div>
         </div>
@@ -1067,22 +1068,85 @@ function renderTrades(){renderIncomingTrades();renderSentTrades();renderRepeatLi
 
 function renderIncomingTrades(){
   var panel=$('tp-rec');panel.innerHTML='';
-  if(!TROCAS_RECEBIDAS||TROCAS_RECEBIDAS.length===0){panel.innerHTML='<div class="empty-state">Nenhuma proposta recebida</div>';return;}
+  if(!TROCAS_RECEBIDAS||TROCAS_RECEBIDAS.length===0){
+    panel.innerHTML='<div class="empty-state">Nenhuma proposta recebida</div>';return;
+  }
   TROCAS_RECEBIDAS.forEach(function(t){
     var card=document.createElement('div');card.className='trade-card incoming';
-    card.innerHTML='<div class="trade-hdr"><div class="trade-from">📨 Proposta de colega</div><div class="trade-time">'+timeAgo(t.criada_em)+'</div></div><div class="tactions"><button class="t-acc" data-id="'+t.id+'">✓ Aceitar</button><button class="t-rej" data-id="'+t.id+'">✕ Recusar</button></div>';
+    // Find the figurinhas involved
+    var figOferece=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_oferecida;});
+    var figDeseja=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_desejada;});
+    var solicitante=ALL_USERS.find(function(u){return u.id===t.solicitante_id;});
+    var nomeSol=solicitante?solicitante.nome_completo:'Colega';
+
+    // Check if I actually have the desired figurinha
+    var euTenho=USER_COLECAO.find(function(c){return c.figurinha_id===t.figurinha_desejada&&c.colada&&c.quantidade>=1;});
+    var imgOferece=figOferece?getImgSrc(figOferece):null;
+    var imgDeseja=figDeseja?getImgSrc(figDeseja):null;
+
+    var thumbO=imgOferece?'<img src="'+imgOferece+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figOferece?rarityEmoji(figOferece.raridade):'?')+'</div>';
+    var thumbD=imgDeseja?'<img src="'+imgDeseja+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figDeseja?rarityEmoji(figDeseja.raridade):'?')+'</div>';
+
+    var warningHtml=!euTenho?'<div style="font-size:10px;color:#ff8aaa;margin-top:8px;font-weight:700">⚠️ Você não tem essa figurinha mais</div>':'';
+
+    card.innerHTML=
+      '<div class="trade-hdr"><div class="trade-from">📨 '+nomeSol+' quer trocar</div><div class="trade-time">'+timeAgo(t.criada_em)+'</div></div>'+
+      '<div class="tcards-row" style="align-items:flex-start;gap:12px;margin:10px 0">'+
+        '<div style="text-align:center;flex:1">'+
+          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(201,168,76,0.3)">'+thumbO+'</div>'+
+          '<div style="font-size:10px;font-weight:700;color:var(--gold)">Oferece</div>'+
+          '<div style="font-size:10px;color:var(--white);">'+(figOferece?figOferece.nome:'?')+'</div>'+
+        '</div>'+
+        '<div style="font-size:24px;color:var(--gold);padding-top:28px">⇄</div>'+
+        '<div style="text-align:center;flex:1">'+
+          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(255,255,255,0.15)">'+thumbD+'</div>'+
+          '<div style="font-size:10px;font-weight:700;color:var(--muted)">Quer de você</div>'+
+          '<div style="font-size:10px;color:var(--white)">'+(figDeseja?figDeseja.nome:'?')+'</div>'+
+        '</div>'+
+      '</div>'+
+      warningHtml+
+      '<div class="tactions">'+
+        (euTenho?'<button class="t-acc" data-id="'+t.id+'">✓ Aceitar</button>':'')+
+        '<button class="t-rej" data-id="'+t.id+'">✕ Recusar</button>'+
+      '</div>';
     panel.appendChild(card);
   });
-  panel.querySelectorAll('.t-acc').forEach(function(btn){btn.onclick=function(){respondTrade(btn.dataset.id,'aceita');};});
+  panel.querySelectorAll('.t-acc').forEach(function(btn){btn.onclick=function(){executarTroca(btn.dataset.id);};});
   panel.querySelectorAll('.t-rej').forEach(function(btn){btn.onclick=function(){respondTrade(btn.dataset.id,'recusada');};});
 }
 
 function renderSentTrades(){
   var panel=$('tp-env');panel.innerHTML='';
-  if(!TROCAS_ENVIADAS||TROCAS_ENVIADAS.length===0){panel.innerHTML='<div class="empty-state">Nenhuma proposta enviada</div>';return;}
+  if(!TROCAS_ENVIADAS||TROCAS_ENVIADAS.length===0){
+    panel.innerHTML='<div class="empty-state">Nenhuma proposta enviada</div>';return;
+  }
   TROCAS_ENVIADAS.forEach(function(t){
     var card=document.createElement('div');card.className='trade-card';
-    card.innerHTML='<div class="trade-hdr"><div class="trade-from">📤 Proposta enviada</div><div class="sent-badge">Aguardando</div></div><div class="tactions"><button class="t-rej" data-id="'+t.id+'">✕ Cancelar</button></div>';
+    var figOferece=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_oferecida;});
+    var figDeseja=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_desejada;});
+    var destinatario=ALL_USERS.find(function(u){return u.id===t.destinatario_id;});
+    var nomeDest=destinatario?destinatario.nome_completo:'Colega';
+    var imgO=figOferece?getImgSrc(figOferece):null;
+    var imgD=figDeseja?getImgSrc(figDeseja):null;
+    var thumbO=imgO?'<img src="'+imgO+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figOferece?rarityEmoji(figOferece.raridade):'?')+'</div>';
+    var thumbD=imgD?'<img src="'+imgD+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figDeseja?rarityEmoji(figDeseja.raridade):'?')+'</div>';
+
+    card.innerHTML=
+      '<div class="trade-hdr"><div class="trade-from">📤 Para '+nomeDest+'</div><div class="sent-badge">Aguardando</div></div>'+
+      '<div class="tcards-row" style="align-items:flex-start;gap:12px;margin:10px 0">'+
+        '<div style="text-align:center;flex:1">'+
+          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(201,168,76,0.3)">'+thumbO+'</div>'+
+          '<div style="font-size:10px;font-weight:700;color:var(--gold)">Você oferece</div>'+
+          '<div style="font-size:10px;color:var(--white)">'+(figOferece?figOferece.nome:'?')+'</div>'+
+        '</div>'+
+        '<div style="font-size:24px;color:var(--gold);padding-top:28px">⇄</div>'+
+        '<div style="text-align:center;flex:1">'+
+          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(255,255,255,0.15)">'+thumbD+'</div>'+
+          '<div style="font-size:10px;font-weight:700;color:var(--muted)">Você quer</div>'+
+          '<div style="font-size:10px;color:var(--white)">'+(figDeseja?figDeseja.nome:'?')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="tactions"><button class="t-rej" data-id="'+t.id+'">✕ Cancelar</button></div>';
     panel.appendChild(card);
   });
   panel.querySelectorAll('.t-rej').forEach(function(btn){btn.onclick=function(){respondTrade(btn.dataset.id,'cancelada');};});
@@ -1108,38 +1172,168 @@ function renderRepeatList(){
 
 async function loadTradeForm(){
   $('trade-form').style.display='block';
-  var wantSel=$('trade-want-sel');wantSel.innerHTML='<option value="">O que quer em troca?</option>';
+
+  // What I want: only figurinhas I don't have colada
+  var wantSel=$('trade-want-sel');
+  wantSel.innerHTML='<option value="">O que quer em troca?</option>';
   ALL_FIGURINHAS.forEach(function(f){
-    var have=USER_COLECAO.find(function(c){return c.figurinha_id===f.id;});
-    if(!have||!have.colada){var opt=document.createElement('option');opt.value=f.id;opt.textContent=f.nome+' ('+f.raridade+')';wantSel.appendChild(opt);}
+    var have=USER_COLECAO.find(function(c){return c.figurinha_id===f.id&&c.colada;});
+    if(!have){
+      var opt=document.createElement('option');
+      opt.value=f.id;
+      opt.textContent='#'+f.numero_album+' '+f.nome+' ('+f.raridade+')';
+      wantSel.appendChild(opt);
+    }
   });
-  var targetSel=$('trade-target-sel');targetSel.innerHTML='<option value="">Selecionar colaborador...</option>';
+
+  // Target: other users
+  var targetSel=$('trade-target-sel');
+  targetSel.innerHTML='<option value="">Selecionar colaborador...</option>';
   ALL_USERS.filter(function(u){return u.id!==CURRENT_USER.id;}).forEach(function(u){
     var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.nome_completo;targetSel.appendChild(opt);
   });
+
+  // When target changes, validate if they have what I want
+  targetSel.onchange=function(){validateTradeTarget();};
+  wantSel.onchange=function(){validateTradeTarget();};
+}
+
+async function validateTradeTarget(){
+  var destId=$('trade-target-sel').value;
+  var figId=parseInt($('trade-want-sel').value);
+  var hint=$('trade-validation-hint');
+  if(!hint)return;
+  if(!destId||!figId){hint.textContent='';return;}
+
+  // Check if target user has the desired figurinha
+  var targetCol=await db('colecao?usuario_id=eq.'+destId+'&figurinha_id=eq.'+figId+'&select=quantidade');
+  var fig=ALL_FIGURINHAS.find(function(f){return f.id===figId;});
+  var user=ALL_USERS.find(function(u){return u.id===destId;});
+  if(targetCol&&targetCol.length>0&&targetCol[0].quantidade>0){
+    hint.textContent='✓ '+user.nome_completo+' tem essa figurinha!';
+    hint.style.color='#80ff80';
+    $('send-trade-btn').disabled=false;
+  }else{
+    hint.textContent='✗ '+user.nome_completo+' não tem essa figurinha';
+    hint.style.color='#ff8aaa';
+    $('send-trade-btn').disabled=true;
+  }
 }
 
 async function sendTrade(){
-  var figOferece=selectedRepeat,figDeseja=parseInt($('trade-want-sel').value),destId=$('trade-target-sel').value;
+  var figOferece=selectedRepeat;
+  var figDeseja=parseInt($('trade-want-sel').value);
+  var destId=$('trade-target-sel').value;
   if(!figOferece){toast('Selecione uma figurinha para oferecer','error');return;}
   if(!figDeseja){toast('Selecione o que quer em troca','error');return;}
   if(!destId){toast('Selecione um colaborador','error');return;}
   if(TROCAS_ENVIADAS.length>=3){toast('Máximo 3 propostas abertas','error');return;}
+
+  // Final validation: does target have the desired figurinha?
+  var targetCol=await db('colecao?usuario_id=eq.'+destId+'&figurinha_id=eq.'+figDeseja+'&select=quantidade');
+  if(!targetCol||targetCol.length===0||targetCol[0].quantidade<1){
+    toast('Esse colaborador não tem essa figurinha','error');return;
+  }
+  // Does I still have the offered figurinha (repeated)?
+  var myFig=USER_COLECAO.find(function(c){return c.figurinha_id===figOferece;});
+  if(!myFig||myFig.quantidade<2){
+    toast('Você não tem repetida essa figurinha','error');return;
+  }
+
   $('send-trade-btn').disabled=true;
-  await db('trocas',{method:'POST',body:{solicitante_id:CURRENT_USER.id,destinatario_id:destId,figurinha_oferecida:figOferece,figurinha_desejada:figDeseja}});
+  await db('trocas',{method:'POST',body:{
+    solicitante_id:CURRENT_USER.id,
+    destinatario_id:destId,
+    figurinha_oferecida:figOferece,
+    figurinha_desejada:figDeseja
+  }});
   await completeMissao('primeira_troca');
   toast('Proposta enviada!','success');
-  $('send-trade-btn').disabled=false;selectedRepeat=null;
+  $('send-trade-btn').disabled=false;
+  selectedRepeat=null;
   TROCAS_ENVIADAS=await db('trocas?select=*&solicitante_id=eq.'+CURRENT_USER.id+'&status=eq.pendente')||[];
   renderSentTrades();showTTab('env',$('tt-env'));
 }
 
+async function executarTroca(tradeId){
+  var trade=TROCAS_RECEBIDAS.find(function(t){return t.id==tradeId;});
+  if(!trade){toast('Proposta não encontrada','error');return;}
+
+  var figOferece=trade.figurinha_oferecida; // solicitante oferece
+  var figDeseja=trade.figurinha_desejada;   // solicitante quer (eu tenho)
+  var solId=trade.solicitante_id;
+  var myId=CURRENT_USER.id;
+
+  // Validate: solicitante still has figOferece
+  var solCol=await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece+'&select=quantidade,colada');
+  if(!solCol||solCol.length===0||solCol[0].quantidade<1){
+    toast('Solicitante não tem mais essa figurinha','error');
+    await respondTrade(tradeId,'cancelada');return;
+  }
+  // Validate: eu still have figDeseja
+  var myCol=USER_COLECAO.find(function(c){return c.figurinha_id===figDeseja;});
+  if(!myCol||myCol.quantidade<1){
+    toast('Você não tem mais essa figurinha','error');
+    await respondTrade(tradeId,'cancelada');return;
+  }
+
+  // Execute the swap:
+  // 1. Remove 1x figOferece from solicitante
+  var solNewQty=solCol[0].quantidade-1;
+  if(solNewQty<=0){
+    await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece,{method:'DELETE',noparse:true});
+  }else{
+    await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece,{method:'PATCH',body:{quantidade:solNewQty}});
+  }
+
+  // 2. Remove 1x figDeseja from me
+  var myNewQty=myCol.quantidade-1;
+  if(myNewQty<=0){
+    await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figDeseja,{method:'DELETE',noparse:true});
+    USER_COLECAO=USER_COLECAO.filter(function(c){return c.figurinha_id!==figDeseja;});
+  }else{
+    await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figDeseja,{method:'PATCH',body:{quantidade:myNewQty}});
+    myCol.quantidade=myNewQty;
+  }
+
+  // 3. Add figOferece to me (I receive what solicitante offered)
+  var iAlreadyHave=USER_COLECAO.find(function(c){return c.figurinha_id===figOferece;});
+  if(iAlreadyHave){
+    await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figOferece,{method:'PATCH',body:{quantidade:iAlreadyHave.quantidade+1}});
+    iAlreadyHave.quantidade++;
+  }else{
+    await db('colecao',{method:'POST',body:{usuario_id:myId,figurinha_id:figOferece,quantidade:1,colada:true}});
+    var figData=ALL_FIGURINHAS.find(function(f){return f.id===figOferece;});
+    USER_COLECAO.push({usuario_id:myId,figurinha_id:figOferece,quantidade:1,colada:true,figurinhas:figData});
+  }
+
+  // 4. Add figDeseja to solicitante
+  var solAlreadyHas=await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figDeseja+'&select=quantidade');
+  if(solAlreadyHas&&solAlreadyHas.length>0){
+    await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figDeseja,{method:'PATCH',body:{quantidade:solAlreadyHas[0].quantidade+1}});
+  }else{
+    await db('colecao',{method:'POST',body:{usuario_id:solId,figurinha_id:figDeseja,quantidade:1,colada:true}});
+  }
+
+  // 5. Mark trade as accepted
+  await db('trocas?id=eq.'+tradeId,{method:'PATCH',body:{status:'aceita',respondida_em:new Date().toISOString()}});
+
+  // Check 5 trocas mission
+  var trocasDone=await db('trocas?select=id&status=eq.aceita&or=(solicitante_id.eq.'+myId+',destinatario_id.eq.'+myId+')');
+  if(trocasDone&&trocasDone.length>=5)await completeMissao('5_trocas');
+
+  TROCAS_RECEBIDAS=TROCAS_RECEBIDAS.filter(function(t){return t.id!=tradeId;});
+  USER_COLECAO=await db('colecao?select=*,figurinhas(*)&usuario_id=eq.'+myId)||[];
+  renderIncomingTrades();renderInventory();buildAlbum();
+  toast('✓ Troca realizada!','success');
+}
+
 async function respondTrade(tradeId,status){
   await db('trocas?id=eq.'+tradeId,{method:'PATCH',body:{status:status,respondida_em:new Date().toISOString()}});
-  TROCAS_RECEBIDAS=TROCAS_RECEBIDAS.filter(function(t){return t.id!==tradeId;});
-  TROCAS_ENVIADAS=TROCAS_ENVIADAS.filter(function(t){return t.id!==tradeId;});
+  TROCAS_RECEBIDAS=TROCAS_RECEBIDAS.filter(function(t){return t.id!=tradeId;});
+  TROCAS_ENVIADAS=TROCAS_ENVIADAS.filter(function(t){return t.id!=tradeId;});
   renderIncomingTrades();renderSentTrades();
-  toast(status==='aceita'?'✓ Troca aceita!':status==='recusada'?'Proposta recusada':'Proposta cancelada',status==='aceita'?'success':'info');
+  toast(status==='recusada'?'Proposta recusada':'Proposta cancelada','info');
 }
 
 function renderGoals(){
