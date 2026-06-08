@@ -1449,10 +1449,19 @@ async function loadAdminData(){
 
 async function admGivepack(){
   var uid=$('adm-pack-sel').value;if(!uid){toast('Selecione colaborador','error');return;}
-  var user=ALL_USERS.find(function(u){return u.id===uid;});
-  await db('usuarios?id=eq.'+uid,{method:'PATCH',body:{pacotes_disponiveis:(user.pacotes_disponiveis||0)+1}});
-  user.pacotes_disponiveis=(user.pacotes_disponiveis||0)+1;
-  admAddLog('Pacote liberado para '+user.nome_completo);toast('✓ Pacote liberado!','success');
+  // Fetch current value from DB to avoid stale state
+  var fresh=await db('usuarios?id=eq.'+uid+'&select=pacotes_disponiveis,nome_completo');
+  if(!fresh||!fresh[0]){toast('Usuário não encontrado','error');return;}
+  var currentPacks=fresh[0].pacotes_disponiveis||0;
+  var res=await db('usuarios?id=eq.'+uid,{method:'PATCH',prefer:'return=representation',body:{pacotes_disponiveis:currentPacks+1}});
+  if(res&&res[0]){
+    var user=ALL_USERS.find(function(u){return u.id===uid;});
+    if(user)user.pacotes_disponiveis=res[0].pacotes_disponiveis;
+    admAddLog('Pacote liberado para '+fresh[0].nome_completo+' (total: '+res[0].pacotes_disponiveis+')');
+    toast('✓ Pacote liberado para '+fresh[0].nome_completo+'!','success');
+  }else{
+    toast('Erro ao liberar pacote','error');
+  }
 }
 
 async function admApplyPenalty(){
