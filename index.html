@@ -678,7 +678,7 @@ async function tryRegister(){
   $('reg-btn').disabled=true;
   var existing=await db('usuarios?select=id&nome_completo=eq.'+encodeURIComponent(nome));
   if(existing&&existing.length>0){$('reg-error').textContent='Nome já cadastrado';$('reg-btn').disabled=false;return;}
-  var result=await db('usuarios',{method:'POST',prefer:'return=representation',body:{nome_completo:nome,senha_hash:hashSenha(senha),setor:setor,is_admin:false,pacotes_disponiveis:1,ultimo_pacote_diario:new Date().toISOString().split('T')[0]}});
+  var result=await db('usuarios',{method:'POST',prefer:'return=representation',body:{nome_completo:nome,senha_hash:hashSenha(senha),setor:setor,is_admin:false,pacotes_disponiveis:1,ultimo_pacote_diario:getBrasiliaDateStr()}});
   if(result&&result[0]&&result[0].id){
     CURRENT_USER=result[0];
     localStorage.setItem('bf_user_id',CURRENT_USER.id);
@@ -727,26 +727,45 @@ async function initApp(){
   }catch(e){console.error(e);showLoading(false);toast('Erro ao carregar. Tente novamente.','error');}
 }
 
-async function checkDailyPack(){
-  // Use local date (Brazil UTC-3) to avoid timezone mismatch
+function getBrasiliaDateStr(){
+  // Returns "YYYY-MM-DD" in Brasilia time (UTC-3)
   var now=new Date();
-  var localDate=new Date(now.getTime()-3*60*60*1000).toISOString().split('T')[0];
+  var brasilia=new Date(now.toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));
+  var y=brasilia.getFullYear();
+  var m=String(brasilia.getMonth()+1).padStart(2,'0');
+  var d=String(brasilia.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+d;
+}
 
-  // Always re-fetch from DB to avoid stale local state
+async function checkDailyPack(){
+  var todayBrasilia=getBrasiliaDateStr();
+
+  // ALWAYS fetch fresh from DB — never trust local state for this check
   var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=ultimo_pacote_diario,pacotes_disponiveis,penalidade_ate');
   if(!fresh||!fresh[0])return;
-  var user=fresh[0];
+  var dbUser=fresh[0];
 
-  if(user.ultimo_pacote_diario===localDate)return; // already got today's pack
-  if(user.penalidade_ate&&new Date(user.penalidade_ate)>new Date())return; // penalized
+  // Already got pack today
+  if(dbUser.ultimo_pacote_diario===todayBrasilia){
+    CURRENT_USER.pacotes_disponiveis=dbUser.pacotes_disponiveis;
+    CURRENT_USER.ultimo_pacote_diario=dbUser.ultimo_pacote_diario;
+    return;
+  }
 
-  // Grant daily pack
+  // Penalized
+  if(dbUser.penalidade_ate&&new Date(dbUser.penalidade_ate)>new Date()){
+    CURRENT_USER.pacotes_disponiveis=dbUser.pacotes_disponiveis;
+    return;
+  }
+
+  // Grant daily pack — use atomic update to prevent race conditions
+  var newPacks=(dbUser.pacotes_disponiveis||0)+1;
   await db('usuarios?id=eq.'+CURRENT_USER.id,{
     method:'PATCH',
-    body:{ultimo_pacote_diario:localDate, pacotes_disponiveis:(user.pacotes_disponiveis||0)+1}
+    body:{ultimo_pacote_diario:todayBrasilia, pacotes_disponiveis:newPacks}
   });
-  CURRENT_USER.pacotes_disponiveis=(user.pacotes_disponiveis||0)+1;
-  CURRENT_USER.ultimo_pacote_diario=localDate;
+  CURRENT_USER.pacotes_disponiveis=newPacks;
+  CURRENT_USER.ultimo_pacote_diario=todayBrasilia;
 }
 
 function checkPenalty(){
