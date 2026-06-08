@@ -452,6 +452,21 @@ html,body{height:100%;background:var(--wine-bg);font-family:"Maven Pro",sans-ser
           </div>
         </div>
         <div class="adm-sec">
+          <div class="adm-sec-title">Remover bloqueio</div>
+          <div class="adm-card">
+            <select class="adm-select" id="adm-unblock-sel"><option value="">Colaborador...</option></select>
+            <button class="adm-btn btn-g" id="adm-unblock-btn">🔓 Remover bloqueio</button>
+          </div>
+        </div>
+        <div class="adm-sec">
+          <div class="adm-sec-title">Dar figurinha específica</div>
+          <div class="adm-card">
+            <select class="adm-select" id="adm-give-fig-user"><option value="">Colaborador...</option></select>
+            <select class="adm-select" id="adm-give-fig-sel"><option value="">Figurinha...</option></select>
+            <button class="adm-btn btn-o" id="adm-give-fig-btn">🃏 Dar figurinha</button>
+          </div>
+        </div>
+        <div class="adm-sec">
           <div class="adm-sec-title">Confirmar missão manual</div>
           <div class="adm-card">
             <select class="adm-select" id="adm-mis-col"><option value="">Colaborador...</option></select>
@@ -543,356 +558,324 @@ const FIGS = {
 
 const META = [["luciano_werner", "comum", "Luciano Werner", "", "Marketing", 1, "colaboradores"], ["amanda", "comum", "Amanda", "", "Atendimento", 2, "colaboradores"], ["andreza", "comum", "Andreza", "", "Manipulação", 3, "colaboradores"], ["dalila", "comum", "Dalila", "", "Atendimento", 4, "colaboradores"], ["flavia", "comum", "Flávia", "", "Atendimento", 5, "colaboradores"], ["fran", "comum", "Francielly \"Fran\"", "", "Atendimento", 6, "colaboradores"], ["gustavo", "comum", "Gustavo", "", "Manipulação", 7, "colaboradores"], ["kelen", "comum", "Kelen", "", "Atendimento", 8, "colaboradores"], ["larissa_helen", "comum", "Larissa Helen", "", "Atendimento", 9, "colaboradores"], ["lili", "comum", "Lili", "", "Manipulação", 10, "colaboradores"], ["liliam", "comum", "Liliam", "", "Atendimento", 11, "colaboradores"], ["luciano_moto", "comum", "Luciano", "", "Entregas", 12, "colaboradores"], ["luiz_felipe", "comum", "Luiz Felipe", "", "Manipulação", 13, "colaboradores"], ["mabel", "comum", "Mabel", "", "Atendimento", 14, "colaboradores"], ["marcelinha", "comum", "Marcelinha", "", "Atendimento", 15, "colaboradores"], ["marilza", "comum", "Marilza", "", "Caixa", 16, "colaboradores"], ["nath", "comum", "Nath", "", "Manipulação", 17, "colaboradores"], ["pamela", "comum", "Pâmela", "", "Atendimento", 18, "colaboradores"], ["ruan", "comum", "Ruan \"Ruanelson\"", "", "Atendimento", 19, "colaboradores"], ["thais", "comum", "Thaís", "", "Caixa", 20, "colaboradores"], ["vanessa", "comum", "Vanessa", "", "Atendimento", 21, "colaboradores"], ["daniele_honorato", "rara", "Daniele Honorato", "10+ anos Bioflora", "Manipulação", 22, "raras"], ["glaucia", "rara", "Gláucia", "10+ anos Bioflora", "Atendimento", 23, "raras"], ["luzia", "rara", "Luzia", "10+ anos Bioflora", "Manipulação", 24, "raras"], ["rolieberson", "rara", "Rolieberson", "10+ anos Bioflora", "Almoxarifado", 25, "raras"], ["ana_angelica", "epica", "Ana Angélica", "Líder de Setor", "Atendimento", 26, "epicas"], ["daniele_epica", "epica", "Daniele", "Líder de Setor", "Manipulação", 27, "epicas"], ["danilo", "epica", "Danilo", "Líder de Setor", "Manipulação", 28, "epicas"], ["wanessa", "lendaria", "Wanessa Werner", "Farmacêutica Responsável", "Direção", 29, "lendarias"], ["wal", "lendaria", "Waldelys \"Wal\"", "Chefe da P* Toda", "Direção", 30, "lendarias"], ["junior", "especial", "Junior", "Sócio FourLab", "Especial", 31, "especiais"], ["bil", "especial", "Bill", "Mascote", "Mascotes", 32, "especiais"], ["flora", "especial", "Flora", "Mascote", "Mascotes", 33, "especiais"], ["ted", "especial", "Ted", "Mascote", "Mascotes", 34, "especiais"], ["pets", "especial", "Pets Bioflora", "Mascotes", "Mascotes", 35, "especiais"], ["merito", "especial", "Troféu Mérito Lojista", "Conquista 2025", "Especiais", 36, "especiais"]];
 
-
 const SUPABASE_URL = 'https://tdyveiolpsgvmbdtxdvb.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkeXZlaW9scHNndm1iZHR4ZHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NTU5NTIsImV4cCI6MjA5NjAzMTk1Mn0.iARRVlKXJOTHGDUZxH4syupv_fyWY0IUmpLGpEk4rc0';
 const ADMIN_PASSWORD = 'bioflora2026';
 const TOTAL_FIGURINHAS = 36;
 
-async function db(path, opts = {}) {
-  const url = SUPABASE_URL + '/rest/v1/' + path;
+async function db(path, opts) {
+  opts = opts || {};
+  var url = SUPABASE_URL + '/rest/v1/' + path;
   try {
-    const res = await fetch(url, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': opts.prefer || '',
-        ...opts.headers
-      },
-      method: opts.method || 'GET',
+    var res = await fetch(url, {
+      headers: Object.assign({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':opts.prefer||''}, opts.headers||{}),
+      method: opts.method||'GET',
       body: opts.body ? JSON.stringify(opts.body) : undefined
     });
     if (opts.noparse) return res;
-    const text = await res.text();
-    if (!res.ok) { console.error('DB', res.status, path, text); return opts.method && opts.method !== 'GET' ? null : []; }
+    var text = await res.text();
+    if (!res.ok) { console.error('DB',res.status,path,text); return (opts.method&&opts.method!=='GET')?null:[]; }
     try { return text ? JSON.parse(text) : []; } catch(e) { return []; }
-  } catch(e) { console.error('Fetch:', e); throw e; }
+  } catch(e) { console.error('Fetch:',e); throw e; }
 }
 
 function hashSenha(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) { h = (Math.imul(31, h) + s.charCodeAt(i)) | 0; }
-  return 'h' + Math.abs(h).toString(36);
+  var h=0;
+  for(var i=0;i<s.length;i++){h=(Math.imul(31,h)+s.charCodeAt(i))|0;}
+  return 'h'+Math.abs(h).toString(36);
 }
 
-let CURRENT_USER = null;
-let ALL_FIGURINHAS = [];
-let USER_COLECAO = [];
-let ALL_USERS = [];
-let ALL_MISSOES = [];
-let MISSOES_COMPLETADAS = [];
-let TROCAS_RECEBIDAS = [];
-let TROCAS_ENVIADAS = [];
-let curPage = 0;
-let shakes = 0;
-let selectedRepeat = null;
+var CURRENT_USER=null, ALL_FIGURINHAS=[], USER_COLECAO=[], ALL_USERS=[], ALL_MISSOES=[], MISSOES_COMPLETADAS=[], TROCAS_RECEBIDAS=[], TROCAS_ENVIADAS=[];
+var curPage=0, shakes=0, selectedRepeat=null, packOpening=false;
 
-function toast(msg, type) {
-  type = type || 'success';
-  const t = document.createElement('div');
-  t.className = 'toast ' + type; t.textContent = msg;
+function toast(msg,type){
+  type=type||'success';
+  var t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
   document.getElementById('app').appendChild(t);
-  setTimeout(function() { t.remove(); }, 2400);
+  setTimeout(function(){t.remove();},2400);
 }
-function $(id) { return document.getElementById(id); }
-function showLoading(show) { $('global-loading').classList.toggle('hidden', !show); }
+function $(id){return document.getElementById(id);}
+function showLoading(show){$('global-loading').classList.toggle('hidden',!show);}
 
-function showScreen_auth(screen) {
-  ['screen-register','screen-login','cover','main'].forEach(function(id) {
-    var el = $(id); if (!el) return;
-    if (id === 'main') { el.style.display = 'none'; el.classList.add('hidden'); }
+function showScreen_auth(screen){
+  ['screen-register','screen-login','cover','main'].forEach(function(id){
+    var el=$(id);if(!el)return;
+    if(id==='main'){el.style.display='none';el.classList.add('hidden');}
     else el.classList.add('hidden');
   });
-  if (screen === 'main') {
-    $('main').style.display = 'flex'; $('main').classList.remove('hidden');
-  } else if (screen === 'cover') {
-    $('cover').classList.remove('hidden');
-  } else {
-    $(screen).classList.remove('hidden');
-  }
+  if(screen==='main'){$('main').style.display='flex';$('main').classList.remove('hidden');}
+  else if(screen==='cover'){$('cover').classList.remove('hidden');}
+  else{$(screen).classList.remove('hidden');}
 }
 
-async function tryRegister() {
-  var nome = $('reg-nome').value.trim();
-  var setor = $('reg-setor').value;
-  var senha = $('reg-senha').value;
-  var senha2 = $('reg-senha2').value;
-  $('reg-error').textContent = '';
-  if (!nome || nome.length < 3) { $('reg-error').textContent = 'Digite seu nome completo'; return; }
-  if (!setor) { $('reg-error').textContent = 'Selecione seu setor'; return; }
-  if (senha.length < 4) { $('reg-error').textContent = 'Senha mínima 4 caracteres'; return; }
-  if (senha !== senha2) { $('reg-error').textContent = 'Senhas não conferem'; return; }
-  $('reg-btn').disabled = true;
-  var existing = await db('usuarios?select=id&nome_completo=eq.' + encodeURIComponent(nome));
-  if (existing && existing.length > 0) { $('reg-error').textContent = 'Nome já cadastrado'; $('reg-btn').disabled = false; return; }
-  var result = await db('usuarios', { method:'POST', prefer:'return=representation', body:{ nome_completo:nome, senha_hash:hashSenha(senha), setor:setor, is_admin:false, pacotes_disponiveis:1, ultimo_pacote_diario:new Date().toISOString().split('T')[0] } });
-  if (result && result[0] && result[0].id) {
-    CURRENT_USER = result[0];
-    localStorage.setItem('bf_user_id', CURRENT_USER.id);
-    ALL_MISSOES = await db('missoes?select=*&order=id&ativa=eq.true') || [];
+async function tryRegister(){
+  var nome=$('reg-nome').value.trim(),setor=$('reg-setor').value,senha=$('reg-senha').value,senha2=$('reg-senha2').value;
+  $('reg-error').textContent='';
+  if(!nome||nome.length<3){$('reg-error').textContent='Digite seu nome completo';return;}
+  if(!setor){$('reg-error').textContent='Selecione seu setor';return;}
+  if(senha.length<4){$('reg-error').textContent='Senha mínima 4 caracteres';return;}
+  if(senha!==senha2){$('reg-error').textContent='Senhas não conferem';return;}
+  $('reg-btn').disabled=true;
+  var existing=await db('usuarios?select=id&nome_completo=eq.'+encodeURIComponent(nome));
+  if(existing&&existing.length>0){$('reg-error').textContent='Nome já cadastrado';$('reg-btn').disabled=false;return;}
+  var result=await db('usuarios',{method:'POST',prefer:'return=representation',body:{nome_completo:nome,senha_hash:hashSenha(senha),setor:setor,is_admin:false,pacotes_disponiveis:1,ultimo_pacote_diario:new Date().toISOString().split('T')[0]}});
+  if(result&&result[0]&&result[0].id){
+    CURRENT_USER=result[0];
+    localStorage.setItem('bf_user_id',CURRENT_USER.id);
+    ALL_MISSOES=await db('missoes?select=*&order=id&ativa=eq.true')||[];
     await completeMissao('cadastro');
     await initApp();
-  } else { $('reg-error').textContent = 'Erro ao criar conta'; $('reg-btn').disabled = false; }
+  }else{$('reg-error').textContent='Erro ao criar conta';$('reg-btn').disabled=false;}
 }
 
-async function tryLogin() {
-  var nome = $('log-nome').value.trim();
-  var senha = $('log-senha').value;
-  $('log-error').textContent = '';
-  if (!nome || !senha) { $('log-error').textContent = 'Preencha todos os campos'; return; }
-  $('log-btn').disabled = true;
-  var users = await db('usuarios?select=*&nome_completo=eq.' + encodeURIComponent(nome));
-  if (!users || users.length === 0) { $('log-error').textContent = 'Usuário não encontrado'; $('log-btn').disabled = false; return; }
-  var user = users[0];
-  if (user.senha_hash !== hashSenha(senha)) { $('log-error').textContent = 'Senha incorreta'; $('log-btn').disabled = false; return; }
-  CURRENT_USER = user;
-  localStorage.setItem('bf_user_id', CURRENT_USER.id);
+async function tryLogin(){
+  var nome=$('log-nome').value.trim(),senha=$('log-senha').value;
+  $('log-error').textContent='';
+  if(!nome||!senha){$('log-error').textContent='Preencha todos os campos';return;}
+  $('log-btn').disabled=true;
+  var users=await db('usuarios?select=*&nome_completo=eq.'+encodeURIComponent(nome));
+  if(!users||users.length===0){$('log-error').textContent='Usuário não encontrado';$('log-btn').disabled=false;return;}
+  var user=users[0];
+  if(user.senha_hash!==hashSenha(senha)){$('log-error').textContent='Senha incorreta';$('log-btn').disabled=false;return;}
+  CURRENT_USER=user;localStorage.setItem('bf_user_id',CURRENT_USER.id);
   await initApp();
 }
 
-async function autoLogin() {
-  var savedId = localStorage.getItem('bf_user_id');
-  if (!savedId) return false;
-  var users = await db('usuarios?id=eq.' + savedId + '&select=*');
-  if (users && users[0]) { CURRENT_USER = users[0]; return true; }
-  localStorage.removeItem('bf_user_id'); return false;
+async function autoLogin(){
+  var savedId=localStorage.getItem('bf_user_id');if(!savedId)return false;
+  var users=await db('usuarios?id=eq.'+savedId+'&select=*');
+  if(users&&users[0]){CURRENT_USER=users[0];return true;}
+  localStorage.removeItem('bf_user_id');return false;
 }
 
-async function initApp() {
+async function initApp(){
   showLoading(true);
-  try {
-    ALL_FIGURINHAS = await db('figurinhas?select=*&order=numero_album') || [];
-    USER_COLECAO = await db('colecao?select=*,figurinhas(*)&usuario_id=eq.' + CURRENT_USER.id) || [];
-    ALL_USERS = await db('usuarios?select=id,nome_completo,setor,is_admin,penalidade_ate,pacotes_disponiveis&order=nome_completo') || [];
-    ALL_MISSOES = await db('missoes?select=*&order=id&ativa=eq.true') || [];
-    MISSOES_COMPLETADAS = await db('missoes_completadas?select=*,missoes(*)&usuario_id=eq.' + CURRENT_USER.id) || [];
-    TROCAS_RECEBIDAS = await db('trocas?select=*&destinatario_id=eq.' + CURRENT_USER.id + '&status=eq.pendente') || [];
-    TROCAS_ENVIADAS = await db('trocas?select=*&solicitante_id=eq.' + CURRENT_USER.id + '&status=eq.pendente') || [];
-
+  try{
+    ALL_FIGURINHAS=await db('figurinhas?select=*&order=numero_album')||[];
+    USER_COLECAO=await db('colecao?select=*,figurinhas(*)&usuario_id=eq.'+CURRENT_USER.id)||[];
+    ALL_USERS=await db('usuarios?select=id,nome_completo,setor,is_admin,penalidade_ate,pacotes_disponiveis&order=nome_completo')||[];
+    ALL_MISSOES=await db('missoes?select=*&order=id&ativa=eq.true')||[];
+    MISSOES_COMPLETADAS=await db('missoes_completadas?select=*,missoes(*)&usuario_id=eq.'+CURRENT_USER.id)||[];
+    TROCAS_RECEBIDAS=await db('trocas?select=*&destinatario_id=eq.'+CURRENT_USER.id+'&status=eq.pendente')||[];
+    TROCAS_ENVIADAS=await db('trocas?select=*&solicitante_id=eq.'+CURRENT_USER.id+'&status=eq.pendente')||[];
     await checkDailyPack();
-    var fresh = await db('usuarios?id=eq.' + CURRENT_USER.id + '&select=*');
-    if (fresh && fresh[0]) CURRENT_USER = fresh[0];
-
+    var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=*');
+    if(fresh&&fresh[0])CURRENT_USER=fresh[0];
     checkPenalty();
-    renderHome();
-    buildAlbum();
-    renderInventory();
-    renderTrades();
-    renderGoals();
-    renderRanking();
-    loadAdminData();
-    showLoading(false);
-    showScreen_auth('cover');
-  } catch(e) {
-    console.error(e);
-    showLoading(false);
-    toast('Erro ao carregar. Tente novamente.', 'error');
-  }
+    renderHome();buildAlbum();renderInventory();renderTrades();renderGoals();renderRanking();loadAdminData();
+    showLoading(false);showScreen_auth('cover');
+  }catch(e){console.error(e);showLoading(false);toast('Erro ao carregar. Tente novamente.','error');}
 }
 
-async function checkDailyPack() {
-  var today = new Date().toISOString().split('T')[0];
-  if (CURRENT_USER.ultimo_pacote_diario === today) return;
-  if (CURRENT_USER.penalidade_ate && new Date(CURRENT_USER.penalidade_ate) > new Date()) return;
-  await db('usuarios?id=eq.' + CURRENT_USER.id, {
-    method:'PATCH',
-    body:{ ultimo_pacote_diario: today, pacotes_disponiveis: (CURRENT_USER.pacotes_disponiveis || 0) + 1 }
-  });
-  CURRENT_USER.pacotes_disponiveis = (CURRENT_USER.pacotes_disponiveis || 0) + 1;
+async function checkDailyPack(){
+  var today=new Date().toISOString().split('T')[0];
+  if(CURRENT_USER.ultimo_pacote_diario===today)return;
+  if(CURRENT_USER.penalidade_ate&&new Date(CURRENT_USER.penalidade_ate)>new Date())return;
+  await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{ultimo_pacote_diario:today,pacotes_disponiveis:(CURRENT_USER.pacotes_disponiveis||0)+1}});
+  CURRENT_USER.pacotes_disponiveis=(CURRENT_USER.pacotes_disponiveis||0)+1;
 }
 
-function checkPenalty() {
-  if (CURRENT_USER.penalidade_ate && new Date(CURRENT_USER.penalidade_ate) > new Date()) {
-    var diff = Math.ceil((new Date(CURRENT_USER.penalidade_ate) - new Date()) / (1000*60*60*24));
-    $('pen-banner').style.display = 'flex';
-    $('pen-days').textContent = diff + (diff===1?' dia':' dias');
-    $('obtn').disabled = true;
-  } else {
-    $('pen-banner').style.display = 'none';
-  }
+function checkPenalty(){
+  if(CURRENT_USER.penalidade_ate&&new Date(CURRENT_USER.penalidade_ate)>new Date()){
+    var diff=Math.ceil((new Date(CURRENT_USER.penalidade_ate)-new Date())/(1000*60*60*24));
+    $('pen-banner').style.display='flex';$('pen-days').textContent=diff+(diff===1?' dia':' dias');
+    $('obtn').disabled=true;
+  }else{$('pen-banner').style.display='none';}
 }
 
-function getImgSrc(fig) {
-  if (fig.imagem_url) return fig.imagem_url;
-  var me = META.find(function(m) { return m[5] == fig.numero_album; });
-  return me ? (FIGS[me[0]] || null) : null;
+function getImgSrc(fig){
+  if(fig.imagem_url)return fig.imagem_url;
+  var me=META.find(function(m){return m[5]==fig.numero_album;});
+  return me?(FIGS[me[0]]||null):null;
 }
 
-function renderHome() {
-  var collected = USER_COLECAO.filter(function(c) { return c.colada; }).length;
-  var repeated = USER_COLECAO.reduce(function(s,c) { return s + Math.max(0, c.quantidade-1); }, 0);
-  var pct = Math.round((collected/TOTAL_FIGURINHAS)*100);
-  var packs = CURRENT_USER.pacotes_disponiveis || 0;
-  $('home-greeting').textContent = CURRENT_USER.nome_completo.split(' ')[0];
-  $('home-collected').textContent = collected;
-  $('home-progress-txt').textContent = collected + ' de ' + TOTAL_FIGURINHAS + ' figurinhas';
-  $('home-bar').style.width = pct + '%';
-  $('stat-collected').textContent = collected;
-  $('stat-repeated').textContent = repeated;
-  var circ = 151, offset = circ - (pct/100)*circ;
-  $('progress-ring').setAttribute('stroke-dashoffset', offset);
-  var isPen = CURRENT_USER.penalidade_ate && new Date(CURRENT_USER.penalidade_ate) > new Date();
-  $('pavail').textContent = isPen ? 'Bloqueado por penalidade' : packs + ' pacote' + (packs!==1?'s':'') + ' disponível' + (packs!==1?'is':'');
-  $('obtn').disabled = packs <= 0 || isPen;
-  if (pct<25) $('home-next-goal').textContent = 'Meta: 25% → +2 pacotes';
-  else if (pct<50) $('home-next-goal').textContent = 'Meta: 50% → +1 pacote';
-  else if (pct<75) $('home-next-goal').textContent = 'Meta: 75% → +2 pacotes';
-  else $('home-next-goal').textContent = 'Incrível! Quase lá!';
-  renderRankForHome();
+function renderHome(){
+  var collected=USER_COLECAO.filter(function(c){return c.colada;}).length;
+  var repeated=USER_COLECAO.reduce(function(s,c){return s+Math.max(0,c.quantidade-1);},0);
+  var pct=Math.round((collected/TOTAL_FIGURINHAS)*100);
+  var packs=CURRENT_USER.pacotes_disponiveis||0;
+  $('home-greeting').textContent=CURRENT_USER.nome_completo.split(' ')[0];
+  $('home-collected').textContent=collected;
+  $('home-progress-txt').textContent=collected+' de '+TOTAL_FIGURINHAS+' figurinhas';
+  $('home-bar').style.width=pct+'%';
+  $('stat-collected').textContent=collected;
+  $('stat-repeated').textContent=repeated;
+  var circ=151,offset=circ-(pct/100)*circ;
+  $('progress-ring').setAttribute('stroke-dashoffset',offset);
+  var isPen=CURRENT_USER.penalidade_ate&&new Date(CURRENT_USER.penalidade_ate)>new Date();
+  $('pavail').textContent=isPen?'Bloqueado por penalidade':packs+' pacote'+(packs!==1?'s':'')+' disponível'+(packs!==1?'is':'');
+  $('obtn').disabled=packs<=0||isPen||packOpening;
+  if(pct<25)$('home-next-goal').textContent='Meta: 25% → +2 pacotes';
+  else if(pct<50)$('home-next-goal').textContent='Meta: 50% → +1 pacote';
+  else if(pct<75)$('home-next-goal').textContent='Meta: 75% → +2 pacotes';
+  else $('home-next-goal').textContent='Incrível! Quase lá!';
   renderMissionsPreview();
+  renderRankBadge();
 }
 
-async function renderRankForHome() {
-  var allCol = await db('colecao?colada=eq.true&select=usuario_id') || [];
-  var counts = {};
-  allCol.forEach(function(c) { counts[c.usuario_id] = (counts[c.usuario_id]||0)+1; });
-  var myCount = counts[CURRENT_USER.id] || 0;
-  var sorted = Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
-  var myRank = sorted.findIndex(function(x){return x[0]===CURRENT_USER.id;}) + 1;
-  $('stat-rank').textContent = myRank > 0 ? myRank+'°' : '1°';
+async function renderRankBadge(){
+  var allCol=await db('colecao?colada=eq.true&select=usuario_id')||[];
+  var counts={};
+  allCol.forEach(function(c){counts[c.usuario_id]=(counts[c.usuario_id]||0)+1;});
+  var sorted=Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
+  var myRank=sorted.findIndex(function(x){return x[0]===CURRENT_USER.id;})+1;
+  $('stat-rank').textContent=myRank>0?myRank+'°':'1°';
 }
 
-function renderMissionsPreview() {
-  var list = $('missions-list'); list.innerHTML = '';
-  var active = ALL_MISSOES.filter(function(m) {
-    var done = MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===m.id;});
-    return !done && m.tipo==='automatica';
+function renderMissionsPreview(){
+  var list=$('missions-list');list.innerHTML='';
+  var active=ALL_MISSOES.filter(function(m){
+    var done=MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===m.id;});
+    return !done&&m.tipo==='automatica';
   }).slice(0,4);
-  if (active.length===0) { list.innerHTML='<div class="empty-state" style="padding:8px 0">Missões automáticas concluídas!</div>'; return; }
-  active.forEach(function(m) {
-    var div=document.createElement('div'); div.className='mitem';
+  if(active.length===0){list.innerHTML='<div class="empty-state" style="padding:8px 0">Missões automáticas concluídas! 🎉</div>';return;}
+  active.forEach(function(m){
+    var div=document.createElement('div');div.className='mitem';
     div.innerHTML='<div class="mico">'+missionIcon(m.codigo)+'</div><div class="minfo"><div class="mname">'+m.nome+'</div><div class="mdesc">'+m.descricao+'</div></div><div class="mrew">+'+m.recompensa_pacotes+' 📦</div>';
     list.appendChild(div);
   });
 }
 
-function missionIcon(code) {
+function missionIcon(code){
   var icons={cadastro:'👋','5_dias':'📅',primeira_troca:'🔄',aniversario:'🎂',album_25:'📊',album_50:'📊',album_75:'📊',todas_lendarias:'👑','5_trocas':'5️⃣',primeira_lendaria:'⭐',meta_setor:'🎯',feedback_positivo:'⭐',conteudo_redes:'📱',ideia_aprovada:'💡',semana_perfeita:'🏅',categoria_completa:'✅'};
   return icons[code]||'🎯';
 }
 
-async function startOpen() {
-  var packs = CURRENT_USER.pacotes_disponiveis || 0;
-  if (packs<=0) { toast('Sem pacotes disponíveis', 'error'); return; }
-  if (CURRENT_USER.penalidade_ate && new Date(CURRENT_USER.penalidade_ate)>new Date()) { toast('Pacotes bloqueados', 'error'); return; }
-  // Decrease pack count BEFORE opening to prevent spam
-  await db('usuarios?id=eq.'+CURRENT_USER.id, {method:'PATCH', body:{pacotes_disponiveis: packs-1}});
-  CURRENT_USER.pacotes_disponiveis = packs - 1;
-  $('obtn').disabled = true;
+async function startOpen(){
+  if(packOpening){toast('Aguarde...','info');return;}
+  var packs=CURRENT_USER.pacotes_disponiveis||0;
+  if(packs<=0){toast('Sem pacotes disponíveis','error');return;}
+  if(CURRENT_USER.penalidade_ate&&new Date(CURRENT_USER.penalidade_ate)>new Date()){toast('Pacotes bloqueados','error');return;}
+  packOpening=true;
+  $('obtn').disabled=true;
+  // Decrement BEFORE opening to prevent spam
+  var ok=await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:packs-1}});
+  CURRENT_USER.pacotes_disponiveis=packs-1;
   $('overlay').classList.add('show');
   $('pphase').style.display='flex';
   $('rphase').classList.remove('show');
-  shakes=0; $('pwrap').classList.remove('shake');
+  shakes=0;$('pwrap').classList.remove('shake');
   $('phint').textContent='Toque para abrir';
 }
 
-function shakePack() {
+function shakePack(){
+  if(!packOpening)return;
   shakes++;
-  var pw=$('pwrap'); pw.classList.remove('shake'); void pw.offsetWidth; pw.classList.add('shake');
-  if (shakes===1) $('phint').textContent='Mais uma vez!';
-  if (shakes>=2) setTimeout(doReveal, 500);
+  var pw=$('pwrap');pw.classList.remove('shake');void pw.offsetWidth;pw.classList.add('shake');
+  if(shakes===1)$('phint').textContent='Mais uma vez!';
+  if(shakes>=2)setTimeout(doReveal,500);
 }
 
-async function doReveal() {
+async function doReveal(){
   $('pphase').style.display='none';
   $('rphase').classList.add('show');
-  var pack = generatePack();
-  var row=$('rrow2'); row.innerHTML='';
-
-  for (var i=0; i<pack.length; i++) {
+  var pack=generatePack();
+  var row=$('rrow2');row.innerHTML='';
+  for(var i=0;i<pack.length;i++){
     var fig=pack[i];
     var existing=USER_COLECAO.find(function(c){return c.figurinha_id===fig.id;});
     var isNew=!existing;
-    if (existing) {
-      await db('colecao?usuario_id=eq.'+CURRENT_USER.id+'&figurinha_id=eq.'+fig.id, {method:'PATCH', body:{quantidade:existing.quantidade+1}});
+    if(existing){
+      await db('colecao?usuario_id=eq.'+CURRENT_USER.id+'&figurinha_id=eq.'+fig.id,{method:'PATCH',body:{quantidade:existing.quantidade+1}});
       existing.quantidade++;
-    } else {
+    }else{
       var newEntry={usuario_id:CURRENT_USER.id,figurinha_id:fig.id,quantidade:1,colada:true};
-      await db('colecao', {method:'POST', prefer:'return=representation', body:newEntry});
+      await db('colecao',{method:'POST',prefer:'return=representation',body:newEntry});
       USER_COLECAO.push(Object.assign({},newEntry,{figurinhas:fig}));
     }
     var el=document.createElement('div');
     var rb=fig.raridade.charAt(0);
     el.className='rcard b'+rb;
     var imgSrc=getImgSrc(fig);
-    if (imgSrc) { var img=document.createElement('img'); img.src=imgSrc; el.appendChild(img); }
-    else {
-      var ph=document.createElement('div'); ph.className='rcard-ph';
-      ph.innerHTML='<div style="font-size:22px">'+rarityEmoji(fig.raridade)+'</div><div class="rcard-ph-name">'+fig.nome.split(' ')[0]+'</div>';
-      el.appendChild(ph);
-    }
-    var sh=document.createElement('div'); sh.className='rshine'; sh.style.animationDelay=(i*.15)+'s'; el.appendChild(sh);
-    var b=document.createElement('div'); b.className='rbadge rb'+rb;
-    b.textContent={comum:'Comum',rara:'Rara',epica:'Épica',lendaria:'Lenda',especial:'Especial'}[fig.raridade]||fig.raridade; el.appendChild(b);
-    if (isNew) { var nb=document.createElement('div'); nb.className='rnew'; nb.textContent='NOVA'; el.appendChild(nb); }
+    if(imgSrc){var img=document.createElement('img');img.src=imgSrc;el.appendChild(img);}
+    else{var ph=document.createElement('div');ph.className='rcard-ph';ph.innerHTML='<div style="font-size:22px">'+rarityEmoji(fig.raridade)+'</div><div class="rcard-ph-name">'+fig.nome.split(' ')[0]+'</div>';el.appendChild(ph);}
+    var sh=document.createElement('div');sh.className='rshine';sh.style.animationDelay=(i*.15)+'s';el.appendChild(sh);
+    var b=document.createElement('div');b.className='rbadge rb'+rb;
+    b.textContent={comum:'Comum',rara:'Rara',epica:'Épica',lendaria:'Lenda',especial:'Especial'}[fig.raridade]||fig.raridade;el.appendChild(b);
+    if(isNew){var nb=document.createElement('div');nb.className='rnew';nb.textContent='NOVA';el.appendChild(nb);}
     row.appendChild(el);
   }
-
-  await db('pacotes', {method:'POST', body:{usuario_id:CURRENT_USER.id, figurinhas_obtidas:pack.map(function(f){return f.id;}), origem:'diario'}});
+  await db('pacotes',{method:'POST',body:{usuario_id:CURRENT_USER.id,figurinhas_obtidas:pack.map(function(f){return f.id;}),origem:'diario'}});
   await checkAutoMissions();
-  $('pavail').textContent = (CURRENT_USER.pacotes_disponiveis) + ' pacote' + (CURRENT_USER.pacotes_disponiveis!==1?'s':'') + ' disponível' + (CURRENT_USER.pacotes_disponiveis!==1?'is':'');
+  $('pavail').textContent=CURRENT_USER.pacotes_disponiveis+' pacote'+(CURRENT_USER.pacotes_disponiveis!==1?'s':'')+' disponível'+(CURRENT_USER.pacotes_disponiveis!==1?'is':'');
 }
 
-function rarityEmoji(r) { return {comum:'👤',rara:'🥉',epica:'🥈',lendaria:'👑',especial:'🌟'}[r]||'👤'; }
+function rarityEmoji(r){return {comum:'👤',rara:'🥉',epica:'🥈',lendaria:'👑',especial:'🌟'}[r]||'👤';}
 
-function generatePack() {
+function generatePack(){
   var common=ALL_FIGURINHAS.filter(function(f){return f.raridade==='comum';});
   var rare=ALL_FIGURINHAS.filter(function(f){return f.raridade==='rara';});
   var epic=ALL_FIGURINHAS.filter(function(f){return f.raridade==='epica';});
   var legendary=ALL_FIGURINHAS.filter(function(f){return f.raridade==='lendaria';});
   var special=ALL_FIGURINHAS.filter(function(f){return f.raridade==='especial';});
-  function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+  function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
   var pack=[];
-  // Always 5 cards: 3 common + 1 (70% rare/30% epic) + 1 wildcard
-  for (var i=0;i<3;i++) pack.push(pick(common));
-  pack.push(Math.random()<0.7 && rare.length ? pick(rare) : (epic.length?pick(epic):pick(common)));
+  // Slot 1-2: comum garantida
+  pack.push(pick(common));pack.push(pick(common));
+  // Slot 3: 60% comum, 40% rara
+  pack.push(Math.random()<0.6?pick(common):(rare.length?pick(rare):pick(common)));
+  // Slot 4: 50% rara, 30% épica, 20% comum
+  var r4=Math.random();
+  if(r4<0.5&&rare.length)pack.push(pick(rare));
+  else if(r4<0.8&&epic.length)pack.push(pick(epic));
+  else pack.push(pick(common));
+  // Slot 5 (wildcard): lendária ~14%, especial ~20%, épica ~25%, rara ~25%, comum resto
   var r5=Math.random();
-  if (r5<0.03 && legendary.length) pack.push(pick(legendary));
-  else if (r5<0.08 && special.length) pack.push(pick(special));
-  else if (r5<0.20 && epic.length) pack.push(pick(epic));
-  else if (r5<0.45 && rare.length) pack.push(pick(rare));
+  if(r5<0.14&&legendary.length)pack.push(pick(legendary));
+  else if(r5<0.34&&special.length)pack.push(pick(special));
+  else if(r5<0.59&&epic.length)pack.push(pick(epic));
+  else if(r5<0.84&&rare.length)pack.push(pick(rare));
   else pack.push(pick(common));
   return pack;
 }
 
-async function closeOv() {
+async function closeOv(){
   $('overlay').classList.remove('show');
+  packOpening=false;
   var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=*');
-  if (fresh&&fresh[0]) CURRENT_USER=fresh[0];
+  if(fresh&&fresh[0])CURRENT_USER=fresh[0];
   USER_COLECAO=await db('colecao?select=*,figurinhas(*)&usuario_id=eq.'+CURRENT_USER.id)||[];
-  renderHome(); buildAlbum(); renderInventory();
+  renderHome();buildAlbum();renderInventory();renderGoals();
 }
 
-async function completeMissao(codigo) {
+async function completeMissao(codigo){
   var missao=ALL_MISSOES.find(function(m){return m.codigo===codigo;});
-  if (!missao) return;
+  if(!missao)return;
   var already=MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===missao.id;});
-  if (already) return;
-  try {
-    await db('missoes_completadas', {method:'POST', body:{usuario_id:CURRENT_USER.id, missao_id:missao.id}});
+  if(already)return;
+  try{
+    await db('missoes_completadas',{method:'POST',body:{usuario_id:CURRENT_USER.id,missao_id:missao.id}});
     var newPacks=(CURRENT_USER.pacotes_disponiveis||0)+missao.recompensa_pacotes;
-    await db('usuarios?id=eq.'+CURRENT_USER.id, {method:'PATCH', body:{pacotes_disponiveis:newPacks}});
+    await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:newPacks}});
     CURRENT_USER.pacotes_disponiveis=newPacks;
     MISSOES_COMPLETADAS.push({missao_id:missao.id,missoes:missao});
     toast('🎉 '+missao.nome+': +'+missao.recompensa_pacotes+' pacote'+(missao.recompensa_pacotes>1?'s':'')+'!','success');
-    renderHome();
-  } catch(e) {}
+    renderGoals();renderHome();
+  }catch(e){}
 }
 
-async function checkAutoMissions() {
+async function resgatarMissao(codigoOrId){
+  // Called when user clicks "resgatar" on completed mission
+  var missao=ALL_MISSOES.find(function(m){return m.codigo===codigoOrId||m.id===codigoOrId;});
+  if(!missao)return;
+  toast('Abrindo '+missao.recompensa_pacotes+' pacote'+(missao.recompensa_pacotes>1?'s':'')+'...','info');
+  // Just show that packs are available - user opens from home
+  setTimeout(function(){showScreen('home');renderHome();},800);
+}
+
+async function checkAutoMissions(){
   var collected=USER_COLECAO.filter(function(c){return c.colada;}).length;
   var pct=collected/TOTAL_FIGURINHAS;
-  if (pct>=0.25) await completeMissao('album_25');
-  if (pct>=0.50) await completeMissao('album_50');
-  if (pct>=0.75) await completeMissao('album_75');
+  if(pct>=0.25)await completeMissao('album_25');
+  if(pct>=0.50)await completeMissao('album_50');
+  if(pct>=0.75)await completeMissao('album_75');
   var hasLend=USER_COLECAO.some(function(c){return c.figurinhas&&c.figurinhas.raridade==='lendaria';});
-  if (hasLend) await completeMissao('primeira_lendaria');
+  if(hasLend)await completeMissao('primeira_lendaria');
   var allLend=ALL_FIGURINHAS.filter(function(f){return f.raridade==='lendaria';});
-  if (allLend.length>0 && allLend.every(function(f){return USER_COLECAO.find(function(c){return c.figurinha_id===f.id;});})) await completeMissao('todas_lendarias');
+  if(allLend.length>0&&allLend.every(function(f){return USER_COLECAO.find(function(c){return c.figurinha_id===f.id;});}))await completeMissao('todas_lendarias');
 }
 
-const ALBUM_PAGES=[
+var ALBUM_PAGES=[
   {id:'colab',label:'Colaboradores',cat:'Equipe Bioflora',filter:function(f){return f.categoria==='colaboradores';}},
   {id:'raras',label:'Veteranas',cat:'Bronze — 10+ anos',filter:function(f){return f.categoria==='raras';}},
   {id:'epics',label:'Líderes',cat:'Prata — Líderes de Setor',filter:function(f){return f.categoria==='epicas';}},
@@ -900,11 +883,11 @@ const ALBUM_PAGES=[
   {id:'spec',label:'Especiais',cat:'Mascotes & Troféus',filter:function(f){return f.categoria==='especiais';}}
 ];
 
-function buildAlbum() {
+function buildAlbum(){
   var viewer=$('pviewer'),tabs=$('atabs'),dots=$('pdots');
   viewer.innerHTML='';tabs.innerHTML='';dots.innerHTML='';
   curPage=0;
-  ALBUM_PAGES.forEach(function(p,i) {
+  ALBUM_PAGES.forEach(function(p,i){
     var pageFigs=ALL_FIGURINHAS.filter(p.filter);
     var page=document.createElement('div');
     page.className='apage'+(i===0?' active':'');
@@ -912,54 +895,52 @@ function buildAlbum() {
     page.innerHTML='<div class="phdr"><div class="pcat">'+p.cat+'</div><div class="pnm">'+p.label+'</div><div class="pprog">'+collected+'/'+pageFigs.length+' figurinhas</div></div><div class="cgrid" id="cg'+i+'"></div><div style="height:8px"></div>';
     viewer.appendChild(page);
     setTimeout(function(idx,figs){
-      var grid=$('cg'+idx); if(!grid)return;
+      var grid=$('cg'+idx);if(!grid)return;
       figs.forEach(function(fig){
         var slot=document.createElement('div');
         var userFig=USER_COLECAO.find(function(c){return c.figurinha_id===fig.id&&c.colada;});
         slot.className='slot'+(userFig?' filled '+fig.raridade:'');
-        if (userFig) {
+        if(userFig){
           var imgSrc=getImgSrc(fig);
-          if (imgSrc) { var img=document.createElement('img'); img.src=imgSrc; slot.appendChild(img); }
-          else { var ph=document.createElement('div'); ph.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:2px'; ph.innerHTML='<div style="font-size:18px">'+rarityEmoji(fig.raridade)+'</div><div style="font-size:7px;font-weight:700;text-align:center;padding:0 2px;color:var(--white)">'+fig.nome.split(' ')[0]+'</div>'; slot.appendChild(ph); }
-        } else { var sp=document.createElement('span'); sp.className='snum'; sp.textContent=fig.numero_album; slot.appendChild(sp); }
+          if(imgSrc){var img=document.createElement('img');img.src=imgSrc;slot.appendChild(img);}
+          else{var ph=document.createElement('div');ph.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:2px';ph.innerHTML='<div style="font-size:18px">'+rarityEmoji(fig.raridade)+'</div><div style="font-size:7px;font-weight:700;text-align:center;padding:0 2px;color:var(--white)">'+fig.nome.split(' ')[0]+'</div>';slot.appendChild(ph);}
+        }else{var sp=document.createElement('span');sp.className='snum';sp.textContent=fig.numero_album;slot.appendChild(sp);}
         grid.appendChild(slot);
       });
-      if (figs.length===0) grid.innerHTML='<div class="empty-state" style="grid-column:1/-1;padding:20px">Nenhuma figurinha</div>';
+      if(figs.length===0)grid.innerHTML='<div class="empty-state" style="grid-column:1/-1;padding:20px">Nenhuma figurinha</div>';
     },0,i,pageFigs);
-    var tab=document.createElement('button'); tab.className='atab'+(i===0?' active':''); tab.textContent=p.label;
-    tab.onclick=(function(n){return function(){goPage(n);};})(i); tabs.appendChild(tab);
-    var dot=document.createElement('div'); dot.className='pdot'+(i===0?' active':'');
-    dot.onclick=(function(n){return function(){goPage(n);};})(i); dots.appendChild(dot);
+    var tab=document.createElement('button');tab.className='atab'+(i===0?' active':'');tab.textContent=p.label;
+    tab.onclick=(function(n){return function(){goPage(n);};})(i);tabs.appendChild(tab);
+    var dot=document.createElement('div');dot.className='pdot'+(i===0?' active':'');
+    dot.onclick=(function(n){return function(){goPage(n);};})(i);dots.appendChild(dot);
   });
   $('apind').textContent='Pág 1/'+ALBUM_PAGES.length;
-  $('prevbtn').disabled=true;
-  $('nextbtn').disabled=ALBUM_PAGES.length<=1;
+  $('prevbtn').disabled=true;$('nextbtn').disabled=ALBUM_PAGES.length<=1;
 }
 
-function goPage(n) {
+function goPage(n){
   var pages=document.querySelectorAll('.apage'),tabs=document.querySelectorAll('.atab'),dots=document.querySelectorAll('.pdot');
   if(pages[curPage]){pages[curPage].classList.remove('active');pages[curPage].classList.add('exit');}
-  var prev=curPage; curPage=n;
+  var prev=curPage;curPage=n;
   setTimeout(function(){if(pages[prev])pages[prev].classList.remove('exit');},300);
   if(pages[curPage])pages[curPage].classList.add('active');
   tabs.forEach(function(t,i){t.classList.toggle('active',i===n);});
   dots.forEach(function(d,i){d.classList.toggle('active',i===n);});
   $('apind').textContent='Pág '+(n+1)+'/'+ALBUM_PAGES.length;
-  $('prevbtn').disabled=n===0;
-  $('nextbtn').disabled=n===ALBUM_PAGES.length-1;
+  $('prevbtn').disabled=n===0;$('nextbtn').disabled=n===ALBUM_PAGES.length-1;
 }
 
-function renderInventory() {
-  var scroll=$('iscroll'); scroll.innerHTML='';
+function renderInventory(){
+  var scroll=$('iscroll');scroll.innerHTML='';
   var items=USER_COLECAO.filter(function(c){return c.figurinhas;});
-  if (items.length===0) { scroll.innerHTML='<div class="empty-state">Nenhuma figurinha.<br>Abra um pacotinho!</div>'; return; }
+  if(items.length===0){scroll.innerHTML='<div class="empty-state">Nenhuma figurinha.<br>Abra um pacotinho!</div>';return;}
   items.sort(function(a,b){return a.figurinhas.numero_album-b.figurinhas.numero_album;});
   items.forEach(function(item){
     var fig=item.figurinhas;
-    var row=document.createElement('div'); row.className='irow';
+    var row=document.createElement('div');row.className='irow';
     var imgSrc=getImgSrc(fig);
-    var thumbHtml=imgSrc?'<img src="'+imgSrc+'" onerror="this.style.display='none'">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:20px">'+rarityEmoji(fig.raridade)+'</div>';
-    var cargoTxt=fig.cargo?'<br><span style="font-size:9px;color:var(--muted)">'+fig.cargo+'</span>':'';
+    var thumbHtml=imgSrc?'<img src="'+imgSrc+'" onerror="this.style.display=\'none\'">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:20px">'+rarityEmoji(fig.raridade)+'</div>';
+    var cargoTxt=fig.cargo?'<div class="irole">'+fig.cargo+'</div>':'';
     var tradeBtn=item.quantidade>1?'<button class="tbtn" data-fig-id="'+fig.id+'">Trocar</button>':'';
     row.innerHTML='<div class="ithumb">'+thumbHtml+'</div><div class="rdot rc-'+fig.raridade+'"></div><div style="flex:1"><div class="iname">'+fig.nome+'</div>'+cargoTxt+'</div><div style="text-align:right;margin-right:6px"><div class="icnt">'+item.quantidade+'x</div><div class="icl">cópias</div></div>'+tradeBtn;
     scroll.appendChild(row);
@@ -969,13 +950,13 @@ function renderInventory() {
   });
 }
 
-function renderTrades() { renderIncomingTrades(); renderSentTrades(); renderRepeatList(); }
+function renderTrades(){renderIncomingTrades();renderSentTrades();renderRepeatList();}
 
-function renderIncomingTrades() {
-  var panel=$('tp-rec'); panel.innerHTML='';
-  if (!TROCAS_RECEBIDAS||TROCAS_RECEBIDAS.length===0) { panel.innerHTML='<div class="empty-state">Nenhuma proposta recebida</div>'; return; }
+function renderIncomingTrades(){
+  var panel=$('tp-rec');panel.innerHTML='';
+  if(!TROCAS_RECEBIDAS||TROCAS_RECEBIDAS.length===0){panel.innerHTML='<div class="empty-state">Nenhuma proposta recebida</div>';return;}
   TROCAS_RECEBIDAS.forEach(function(t){
-    var card=document.createElement('div'); card.className='trade-card incoming';
+    var card=document.createElement('div');card.className='trade-card incoming';
     card.innerHTML='<div class="trade-hdr"><div class="trade-from">📨 Proposta de colega</div><div class="trade-time">'+timeAgo(t.criada_em)+'</div></div><div class="tactions"><button class="t-acc" data-id="'+t.id+'">✓ Aceitar</button><button class="t-rej" data-id="'+t.id+'">✕ Recusar</button></div>';
     panel.appendChild(card);
   });
@@ -983,25 +964,25 @@ function renderIncomingTrades() {
   panel.querySelectorAll('.t-rej').forEach(function(btn){btn.onclick=function(){respondTrade(btn.dataset.id,'recusada');};});
 }
 
-function renderSentTrades() {
-  var panel=$('tp-env'); panel.innerHTML='';
-  if (!TROCAS_ENVIADAS||TROCAS_ENVIADAS.length===0) { panel.innerHTML='<div class="empty-state">Nenhuma proposta enviada</div>'; return; }
+function renderSentTrades(){
+  var panel=$('tp-env');panel.innerHTML='';
+  if(!TROCAS_ENVIADAS||TROCAS_ENVIADAS.length===0){panel.innerHTML='<div class="empty-state">Nenhuma proposta enviada</div>';return;}
   TROCAS_ENVIADAS.forEach(function(t){
-    var card=document.createElement('div'); card.className='trade-card';
+    var card=document.createElement('div');card.className='trade-card';
     card.innerHTML='<div class="trade-hdr"><div class="trade-from">📤 Proposta enviada</div><div class="sent-badge">Aguardando</div></div><div class="tactions"><button class="t-rej" data-id="'+t.id+'">✕ Cancelar</button></div>';
     panel.appendChild(card);
   });
   panel.querySelectorAll('.t-rej').forEach(function(btn){btn.onclick=function(){respondTrade(btn.dataset.id,'cancelada');};});
 }
 
-function renderRepeatList() {
-  var list=$('repeated-list'); list.innerHTML='';
+function renderRepeatList(){
+  var list=$('repeated-list');list.innerHTML='';
   var repeats=USER_COLECAO.filter(function(c){return c.quantidade>1&&c.figurinhas;});
-  if (repeats.length===0) { $('rep-empty').style.display='block'; $('trade-form').style.display='none'; return; }
+  if(repeats.length===0){$('rep-empty').style.display='block';$('trade-form').style.display='none';return;}
   $('rep-empty').style.display='none';
   repeats.forEach(function(item){
     var fig=item.figurinhas;
-    var card=document.createElement('div'); card.className='sel-card'+(selectedRepeat===fig.id?' chosen':'');
+    var card=document.createElement('div');card.className='sel-card'+(selectedRepeat===fig.id?' chosen':'');
     card.dataset.figId=fig.id;
     var imgSrc=getImgSrc(fig);
     var thumbHtml=imgSrc?'<img src="'+imgSrc+'" style="width:40px;height:56px;object-fit:cover;border-radius:5px">':'<div style="width:40px;height:56px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--wine-card);border-radius:5px">'+rarityEmoji(fig.raridade)+'</div>';
@@ -1009,163 +990,207 @@ function renderRepeatList() {
     card.onclick=function(){selectedRepeat=fig.id;document.querySelectorAll('.sel-card').forEach(function(c){c.classList.remove('chosen');});card.classList.add('chosen');loadTradeForm();};
     list.appendChild(card);
   });
-  if (selectedRepeat) loadTradeForm();
+  if(selectedRepeat)loadTradeForm();
 }
 
-async function loadTradeForm() {
+async function loadTradeForm(){
   $('trade-form').style.display='block';
-  var wantSel=$('trade-want-sel'); wantSel.innerHTML='<option value="">O que quer em troca?</option>';
+  var wantSel=$('trade-want-sel');wantSel.innerHTML='<option value="">O que quer em troca?</option>';
   ALL_FIGURINHAS.forEach(function(f){
     var have=USER_COLECAO.find(function(c){return c.figurinha_id===f.id;});
-    if (!have||!have.colada) { var opt=document.createElement('option'); opt.value=f.id; opt.textContent=f.nome+' ('+f.raridade+')'; wantSel.appendChild(opt); }
+    if(!have||!have.colada){var opt=document.createElement('option');opt.value=f.id;opt.textContent=f.nome+' ('+f.raridade+')';wantSel.appendChild(opt);}
   });
-  var targetSel=$('trade-target-sel'); targetSel.innerHTML='<option value="">Selecionar colaborador...</option>';
+  var targetSel=$('trade-target-sel');targetSel.innerHTML='<option value="">Selecionar colaborador...</option>';
   ALL_USERS.filter(function(u){return u.id!==CURRENT_USER.id;}).forEach(function(u){
-    var opt=document.createElement('option'); opt.value=u.id; opt.textContent=u.nome_completo; targetSel.appendChild(opt);
+    var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.nome_completo;targetSel.appendChild(opt);
   });
 }
 
-async function sendTrade() {
-  var figOferece=selectedRepeat, figDeseja=parseInt($('trade-want-sel').value), destId=$('trade-target-sel').value;
-  if (!figOferece) { toast('Selecione uma figurinha para oferecer','error'); return; }
-  if (!figDeseja) { toast('Selecione o que quer em troca','error'); return; }
-  if (!destId) { toast('Selecione um colaborador','error'); return; }
-  if (TROCAS_ENVIADAS.length>=3) { toast('Máximo 3 propostas abertas','error'); return; }
+async function sendTrade(){
+  var figOferece=selectedRepeat,figDeseja=parseInt($('trade-want-sel').value),destId=$('trade-target-sel').value;
+  if(!figOferece){toast('Selecione uma figurinha para oferecer','error');return;}
+  if(!figDeseja){toast('Selecione o que quer em troca','error');return;}
+  if(!destId){toast('Selecione um colaborador','error');return;}
+  if(TROCAS_ENVIADAS.length>=3){toast('Máximo 3 propostas abertas','error');return;}
   $('send-trade-btn').disabled=true;
   await db('trocas',{method:'POST',body:{solicitante_id:CURRENT_USER.id,destinatario_id:destId,figurinha_oferecida:figOferece,figurinha_desejada:figDeseja}});
   await completeMissao('primeira_troca');
   toast('Proposta enviada!','success');
-  $('send-trade-btn').disabled=false; selectedRepeat=null;
+  $('send-trade-btn').disabled=false;selectedRepeat=null;
   TROCAS_ENVIADAS=await db('trocas?select=*&solicitante_id=eq.'+CURRENT_USER.id+'&status=eq.pendente')||[];
-  renderSentTrades(); showTTab('env',$('tt-env'));
+  renderSentTrades();showTTab('env',$('tt-env'));
 }
 
-async function respondTrade(tradeId,status) {
+async function respondTrade(tradeId,status){
   await db('trocas?id=eq.'+tradeId,{method:'PATCH',body:{status:status,respondida_em:new Date().toISOString()}});
   TROCAS_RECEBIDAS=TROCAS_RECEBIDAS.filter(function(t){return t.id!==tradeId;});
   TROCAS_ENVIADAS=TROCAS_ENVIADAS.filter(function(t){return t.id!==tradeId;});
-  renderIncomingTrades(); renderSentTrades();
-  toast(status==='aceita'?'✓ Troca aceita!':status==='recusada'?'Proposta recusada':'Proposta cancelada', status==='aceita'?'success':'info');
+  renderIncomingTrades();renderSentTrades();
+  toast(status==='aceita'?'✓ Troca aceita!':status==='recusada'?'Proposta recusada':'Proposta cancelada',status==='aceita'?'success':'info');
 }
 
-function renderGoals() {
-  var list=$('goals-list'); list.innerHTML='';
+function renderGoals(){
+  var list=$('goals-list');list.innerHTML='';
   var auto=ALL_MISSOES.filter(function(m){return m.tipo==='automatica';});
   var manual=ALL_MISSOES.filter(function(m){return m.tipo==='manual';});
   function catTitle(txt){var d=document.createElement('div');d.className='goal-cat';d.textContent=txt;list.appendChild(d);}
-  catTitle('Automáticas'); auto.forEach(function(m){renderGoalItem(list,m);});
-  catTitle('Manuais — admin libera'); manual.forEach(function(m){renderGoalItem(list,m);});
+  catTitle('Automáticas');auto.forEach(function(m){renderGoalItem(list,m);});
+  catTitle('Manuais — admin libera');manual.forEach(function(m){renderGoalItem(list,m);});
   catTitle('Penalidade');
-  var pen=document.createElement('div'); pen.className='goal-item'; pen.style.borderColor='rgba(200,48,90,0.25)';
+  var pen=document.createElement('div');pen.className='goal-item';pen.style.borderColor='rgba(200,48,90,0.25)';
   pen.innerHTML='<div class="goal-top"><div class="goal-ico">🔒</div><div class="goal-name">Erro / feedback negativo</div><div class="goal-rew" style="color:#ff8aaa">Bloqueio 2 dias</div></div><div class="goal-desc">Pacotes bloqueados por 2 dias. Figurinhas já coletadas não são afetadas.</div>';
   list.appendChild(pen);
 }
 
-function renderGoalItem(list,m) {
+function renderGoalItem(list,m){
   var done=MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===m.id;});
-  var div=document.createElement('div'); div.className='goal-item'+(done?' done':'');
-  var progHtml=done?'<div class="goal-bar-bg"><div class="goal-bar" style="width:100%"></div></div><div class="goal-prog">✓ Concluído! +'+m.recompensa_pacotes+' pacote'+(m.recompensa_pacotes>1?'s':'')+'</div>':m.tipo==='manual'?'<div class="goal-prog">Aguardando confirmação do admin</div>':'<div class="goal-bar-bg"><div class="goal-bar" style="width:0%"></div></div>';
+  var div=document.createElement('div');
+  div.className='goal-item'+(done?' done':'');
+  var progHtml='';
+  if(done){
+    // Completed: green, show resgatar button
+    progHtml='<div class="goal-bar-bg"><div class="goal-bar" style="width:100%;background:var(--green)"></div></div><div class="goal-prog" style="color:#80ff80">✓ Concluído — +'+m.recompensa_pacotes+' pacote'+(m.recompensa_pacotes>1?'s':'')+' creditado'+(m.recompensa_pacotes>1?'s':'')+'</div>';
+  }else if(m.tipo==='manual'){
+    progHtml='<div class="goal-prog">Aguardando confirmação do admin</div>';
+  }else{
+    progHtml='<div class="goal-bar-bg"><div class="goal-bar" style="width:0%"></div></div>';
+  }
   div.innerHTML=(done?'<div class="done-badge">✓ Feito</div>':'')+'<div class="goal-top"><div class="goal-ico">'+missionIcon(m.codigo)+'</div><div class="goal-name">'+m.nome+'</div><div class="goal-rew">+'+m.recompensa_pacotes+' 📦</div></div><div class="goal-desc">'+m.descricao+'</div>'+progHtml;
   list.appendChild(div);
 }
 
-async function renderRanking() {
-  var list=$('ranking-list'); list.innerHTML='';
+async function renderRanking(){
+  var list=$('ranking-list');list.innerHTML='';
   var allCol=await db('colecao?colada=eq.true&select=usuario_id')||[];
   var counts={};
   allCol.forEach(function(c){counts[c.usuario_id]=(counts[c.usuario_id]||0)+1;});
-  var sorted=ALL_USERS.map(function(u){return Object.assign({},u,{collected:counts[u.id]||0,pct:Math.round(((counts[u.id]||0)/TOTAL_FIGURINHAS)*100)});}).sort(function(a,b){return b.collected-a.collected;});
+  var sorted=ALL_USERS.map(function(u){
+    return Object.assign({},u,{collected:counts[u.id]||0,pct:Math.round(((counts[u.id]||0)/TOTAL_FIGURINHAS)*100)});
+  }).sort(function(a,b){return b.collected-a.collected;});
   sorted.forEach(function(u,i){
     var isPen=u.penalidade_ate&&new Date(u.penalidade_ate)>new Date();
     var isMe=u.id===CURRENT_USER.id;
-    var row=document.createElement('div'); row.className='rrow'+(i===0?' r1':'')+(isMe?' rme':'');
+    var row=document.createElement('div');row.className='rrow'+(i===0?' r1':'')+(isMe?' rme':'');
     row.innerHTML='<div class="rpos">'+(i+1)+'</div><div class="rav">'+u.nome_completo.substring(0,2).toUpperCase()+'</div><div class="rif"><div class="rnm">'+u.nome_completo+(isMe?' (você)':'')+'</div>'+(isPen?'<div class="r-pen">🔒 Bloqueado</div>':'')+'<div class="rbarbg"><div class="rbar" style="width:'+u.pct+'%"></div></div></div><div class="rpct">'+u.pct+'%</div>';
     list.appendChild(row);
   });
-  if (sorted.length===0) list.innerHTML='<div class="empty-state">Nenhum colaborador ainda</div>';
+  if(sorted.length===0)list.innerHTML='<div class="empty-state">Nenhum colaborador ainda</div>';
 }
 
-async function loadAdminData() {
-  ['adm-pack-sel','adm-pen-sel','adm-mis-col'].forEach(function(selId){
-    var sel=$(selId); if(!sel)return;
+async function loadAdminData(){
+  // Populate user selects
+  ['adm-pack-sel','adm-pen-sel','adm-unblock-sel','adm-mis-col','adm-give-fig-user'].forEach(function(selId){
+    var sel=$(selId);if(!sel)return;
     sel.innerHTML='<option value="">Colaborador...</option>';
-    ALL_USERS.forEach(function(u){var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.nome_completo;sel.appendChild(opt);});
+    ALL_USERS.forEach(function(u){var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.nome_completo+(u.penalidade_ate&&new Date(u.penalidade_ate)>new Date()?' 🔒':'');sel.appendChild(opt);});
   });
   var misSel=$('adm-mis-sel');
-  if (misSel) {
+  if(misSel){
     misSel.innerHTML='<option value="">Missão...</option>';
     ALL_MISSOES.filter(function(m){return m.tipo==='manual';}).forEach(function(m){var opt=document.createElement('option');opt.value=m.id;opt.textContent=m.nome+' (+'+m.recompensa_pacotes+')';misSel.appendChild(opt);});
   }
-  var ul=$('adm-users-list'); if(!ul)return; ul.innerHTML='';
+  // Populate figurinha select for give-fig
+  var figSel=$('adm-give-fig-sel');
+  if(figSel){
+    figSel.innerHTML='<option value="">Figurinha...</option>';
+    ALL_FIGURINHAS.forEach(function(f){var opt=document.createElement('option');opt.value=f.id;opt.textContent='#'+f.numero_album+' '+f.nome+' ('+f.raridade+')';figSel.appendChild(opt);});
+  }
+  // Users overview
+  var ul=$('adm-users-list');if(!ul)return;ul.innerHTML='';
   ALL_USERS.forEach(function(u){
+    var allCol=USER_COLECAO.filter(function(c){return c.usuario_id===u.id&&c.colada;}).length;
     var isPen=u.penalidade_ate&&new Date(u.penalidade_ate)>new Date();
-    var div=document.createElement('div'); div.className='adm-cr'; div.style.borderColor=isPen?'rgba(200,48,90,0.3)':'';
+    var div=document.createElement('div');div.className='adm-cr';div.style.borderColor=isPen?'rgba(200,48,90,0.3)':'';
     div.innerHTML='<div class="adm-av">'+u.nome_completo.substring(0,2).toUpperCase()+'</div><div class="adm-nm">'+u.nome_completo+(isPen?' <span style="font-size:9px;color:#ff8aaa">🔒</span>':'')+'</div><div class="adm-pct">'+u.setor+'</div>';
     ul.appendChild(div);
   });
-  var logList=$('adm-log-list'); if(logList) logList.innerHTML='<div class="empty-state" style="padding:12px 0">Nenhuma ação ainda</div>';
+  var logList=$('adm-log-list');if(logList)logList.innerHTML='<div class="empty-state" style="padding:12px 0">Nenhuma ação ainda</div>';
 }
 
-async function admGivepack() {
-  var uid=$('adm-pack-sel').value; if(!uid){toast('Selecione colaborador','error');return;}
+async function admGivepack(){
+  var uid=$('adm-pack-sel').value;if(!uid){toast('Selecione colaborador','error');return;}
   var user=ALL_USERS.find(function(u){return u.id===uid;});
   await db('usuarios?id=eq.'+uid,{method:'PATCH',body:{pacotes_disponiveis:(user.pacotes_disponiveis||0)+1}});
-  admAddLog('Pacote liberado para '+user.nome_completo);
-  toast('✓ Pacote liberado!','success');
+  user.pacotes_disponiveis=(user.pacotes_disponiveis||0)+1;
+  admAddLog('Pacote liberado para '+user.nome_completo);toast('✓ Pacote liberado!','success');
 }
 
-async function admApplyPenalty() {
-  var uid=$('adm-pen-sel').value; if(!uid){toast('Selecione colaborador','error');return;}
+async function admApplyPenalty(){
+  var uid=$('adm-pen-sel').value;if(!uid){toast('Selecione colaborador','error');return;}
   var user=ALL_USERS.find(function(u){return u.id===uid;});
   var until=new Date(Date.now()+2*24*60*60*1000).toISOString();
   await db('usuarios?id=eq.'+uid,{method:'PATCH',body:{penalidade_ate:until}});
   await db('admin_log',{method:'POST',body:{admin_id:CURRENT_USER.id,acao:'penalidade',target_usuario_id:uid,detalhes:'2 dias'}});
-  admAddLog('Bloqueio aplicado em '+user.nome_completo);
-  toast('🔒 Penalidade aplicada!','success');
+  admAddLog('Bloqueio aplicado em '+user.nome_completo);toast('🔒 Penalidade aplicada!','success');
 }
 
-async function admConfirmMission() {
-  var uid=$('adm-mis-col').value, mid=$('adm-mis-sel').value;
-  if (!uid||!mid){toast('Preencha todos os campos','error');return;}
-  var user=ALL_USERS.find(function(u){return u.id===uid;}), missao=ALL_MISSOES.find(function(m){return m.id===parseInt(mid);});
-  try {
+async function admUnblock(){
+  var uid=$('adm-unblock-sel').value;if(!uid){toast('Selecione colaborador','error');return;}
+  var user=ALL_USERS.find(function(u){return u.id===uid;});
+  await db('usuarios?id=eq.'+uid,{method:'PATCH',body:{penalidade_ate:null}});
+  user.penalidade_ate=null;
+  admAddLog('Bloqueio removido de '+user.nome_completo);toast('✓ Bloqueio removido!','success');
+  await loadAdminData();
+}
+
+async function admGiveFig(){
+  var uid=$('adm-give-fig-user').value,fid=parseInt($('adm-give-fig-sel').value);
+  if(!uid||!fid){toast('Preencha todos os campos','error');return;}
+  var user=ALL_USERS.find(function(u){return u.id===uid;});
+  var fig=ALL_FIGURINHAS.find(function(f){return f.id===fid;});
+  // Check if user already has it
+  var existing=await db('colecao?usuario_id=eq.'+uid+'&figurinha_id=eq.'+fid+'&select=*');
+  if(existing&&existing.length>0){
+    await db('colecao?usuario_id=eq.'+uid+'&figurinha_id=eq.'+fid,{method:'PATCH',body:{quantidade:existing[0].quantidade+1}});
+  }else{
+    await db('colecao',{method:'POST',body:{usuario_id:uid,figurinha_id:fid,quantidade:1,colada:true}});
+  }
+  admAddLog('Figurinha "'+fig.nome+'" dada para '+user.nome_completo);
+  toast('✓ Figurinha entregue!','success');
+}
+
+async function admConfirmMission(){
+  var uid=$('adm-mis-col').value,mid=$('adm-mis-sel').value;
+  if(!uid||!mid){toast('Preencha todos os campos','error');return;}
+  var user=ALL_USERS.find(function(u){return u.id===uid;});
+  var missao=ALL_MISSOES.find(function(m){return m.id===parseInt(mid);});
+  try{
     await db('missoes_completadas',{method:'POST',body:{usuario_id:uid,missao_id:mid,confirmada_por:CURRENT_USER.id}});
     await db('usuarios?id=eq.'+uid,{method:'PATCH',body:{pacotes_disponiveis:(user.pacotes_disponiveis||0)+missao.recompensa_pacotes}});
     await db('admin_log',{method:'POST',body:{admin_id:CURRENT_USER.id,acao:'missao_confirmada',target_usuario_id:uid,detalhes:missao.nome}});
-    admAddLog('Missão "'+missao.nome+'" para '+user.nome_completo);
-    toast('✓ Missão confirmada!','success');
-  } catch(e){toast('Erro ou missão já concluída','error');}
+    admAddLog('Missão "'+missao.nome+'" confirmada para '+user.nome_completo);toast('✓ Missão confirmada!','success');
+  }catch(e){toast('Erro ou missão já concluída','error');}
 }
 
-function admAddLog(msg) {
+function admAddLog(msg){
   var logList=$('adm-log-list');
-  var now=new Date(), time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  var item=document.createElement('div'); item.className='adm-log-item';
+  var now=new Date(),time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  var item=document.createElement('div');item.className='adm-log-item';
   item.innerHTML='<b>Hoje '+time+'</b> — '+msg;
   logList.insertBefore(item,logList.firstChild);
-  var empty=logList.querySelector('.empty-state'); if(empty)empty.remove();
+  var empty=logList.querySelector('.empty-state');if(empty)empty.remove();
 }
 
-function showScreen(id) {
+function showScreen(id){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
   document.querySelectorAll('.dock-btn').forEach(function(b){b.classList.remove('active');});
   $(id).classList.add('active');
-  var btn=document.querySelector('[data-screen="'+id+'"]'); if(btn)btn.classList.add('active');
-  if (id==='ranking') renderRanking();
+  var btn=document.querySelector('[data-screen="'+id+'"]');if(btn)btn.classList.add('active');
+  if(id==='ranking')renderRanking();
 }
 
-function showTTab(id,btn) {
+function showTTab(id,btn){
   document.querySelectorAll('.tpanel').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.ttab').forEach(function(t){t.classList.remove('active');});
-  $('tp-'+id).classList.add('active'); if(btn)btn.classList.add('active');
+  $('tp-'+id).classList.add('active');if(btn)btn.classList.add('active');
 }
 
-function timeAgo(dateStr) {
-  var diff=Date.now()-new Date(dateStr).getTime(), h=Math.floor(diff/3600000);
-  if(h<1)return 'agora'; if(h<24)return 'há '+h+'h'; return 'há '+Math.floor(h/24)+'d';
+function timeAgo(dateStr){
+  var diff=Date.now()-new Date(dateStr).getTime(),h=Math.floor(diff/3600000);
+  if(h<1)return 'agora';if(h<24)return 'há '+h+'h';return 'há '+Math.floor(h/24)+'d';
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded',async function(){
   showLoading(true);
   if(typeof FIGS!=='undefined'){
     ['reg-logo','log-logo'].forEach(function(id){var el=$(id);if(el&&FIGS.capa)el.src=FIGS.capa;});
@@ -1194,6 +1219,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   $('adm-pw').onkeydown=function(e){if(e.key==='Enter')$('adm-login-btn').click();};
   $('adm-pack-btn').onclick=admGivepack;
   $('adm-pen-btn').onclick=admApplyPenalty;
+  $('adm-unblock-btn').onclick=admUnblock;
+  $('adm-give-fig-btn').onclick=admGiveFig;
   $('adm-mis-btn').onclick=admConfirmMission;
 
   showLoading(true);
