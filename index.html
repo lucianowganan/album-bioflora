@@ -728,11 +728,25 @@ async function initApp(){
 }
 
 async function checkDailyPack(){
-  var today=new Date().toISOString().split('T')[0];
-  if(CURRENT_USER.ultimo_pacote_diario===today)return;
-  if(CURRENT_USER.penalidade_ate&&new Date(CURRENT_USER.penalidade_ate)>new Date())return;
-  await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{ultimo_pacote_diario:today,pacotes_disponiveis:(CURRENT_USER.pacotes_disponiveis||0)+1}});
-  CURRENT_USER.pacotes_disponiveis=(CURRENT_USER.pacotes_disponiveis||0)+1;
+  // Use local date (Brazil UTC-3) to avoid timezone mismatch
+  var now=new Date();
+  var localDate=new Date(now.getTime()-3*60*60*1000).toISOString().split('T')[0];
+
+  // Always re-fetch from DB to avoid stale local state
+  var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=ultimo_pacote_diario,pacotes_disponiveis,penalidade_ate');
+  if(!fresh||!fresh[0])return;
+  var user=fresh[0];
+
+  if(user.ultimo_pacote_diario===localDate)return; // already got today's pack
+  if(user.penalidade_ate&&new Date(user.penalidade_ate)>new Date())return; // penalized
+
+  // Grant daily pack
+  await db('usuarios?id=eq.'+CURRENT_USER.id,{
+    method:'PATCH',
+    body:{ultimo_pacote_diario:localDate, pacotes_disponiveis:(user.pacotes_disponiveis||0)+1}
+  });
+  CURRENT_USER.pacotes_disponiveis=(user.pacotes_disponiveis||0)+1;
+  CURRENT_USER.ultimo_pacote_diario=localDate;
 }
 
 function checkPenalty(){
