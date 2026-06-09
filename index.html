@@ -755,14 +755,23 @@ async function renderRankBadge(){
 
 function renderMissionsPreview(){
   var list=$('missions-list');list.innerHTML='';
-  var active=ALL_MISSOES.filter(function(m){
-    var done=MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===m.id;});
-    return !done&&m.tipo==='automatica';
-  }).slice(0,4);
-  if(active.length===0){list.innerHTML='<div class="empty-state" style="padding:8px 0">Missões automáticas concluídas! 🎉</div>';return;}
-  active.forEach(function(m){
-    var div=document.createElement('div');div.className='mitem';
-    div.innerHTML='<div class="mico">'+missionIcon(m.codigo)+'</div><div class="minfo"><div class="mname">'+m.nome+'</div><div class="mdesc">'+m.descricao+'</div></div><div class="mrew">+'+m.recompensa_pacotes+' 📦</div>';
+  // Show up to 4: first show incomplete ones, then recently completed
+  var incomplete=ALL_MISSOES.filter(function(m){
+    return !MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===m.id;})&&m.tipo==='automatica';
+  });
+  var completed=ALL_MISSOES.filter(function(m){
+    return !!MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===m.id;});
+  });
+  // Show incomplete first, pad with completed if needed, max 4
+  var toShow=incomplete.slice(0,4);
+  if(toShow.length<4) toShow=toShow.concat(completed.slice(0,4-toShow.length));
+  if(toShow.length===0){list.innerHTML='<div class="empty-state" style="padding:8px 0">Nenhuma missão ativa.</div>';return;}
+  toShow.forEach(function(m){
+    var done=!!MISSOES_COMPLETADAS.find(function(mc){return mc.missao_id===m.id;});
+    var div=document.createElement('div');
+    div.className='mitem'+(done?' mdone':'');
+    div.style.cssText=done?'opacity:0.45;border-color:rgba(80,180,80,0.2);background:rgba(50,120,50,0.08)':'';
+    div.innerHTML='<div class="mico">'+missionIcon(m.codigo)+'</div><div class="minfo"><div class="mname">'+(done?'✓ ':'')+m.nome+'</div><div class="mdesc">'+m.descricao+'</div></div><div class="mrew" style="color:'+(done?'#80ff80':'var(--gold)')+'">+'+(done?'Feito':m.recompensa_pacotes+' 📦')+'</div>';
     list.appendChild(div);
   });
 }
@@ -1372,8 +1381,8 @@ function showAlbumComplete(){
   b.style.cssText='position:fixed;inset:0;background:rgba(8,1,5,0.96);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center';
   var t1=document.createElement('div');t1.style.cssText='font-size:64px;margin-bottom:16px';t1.textContent='🏆';
   var t2=document.createElement('div');t2.style.cssText='font-size:24px;font-weight:900;color:#c9a84c;margin-bottom:8px';t2.textContent='ALBUM COMPLETO!';
-  var t3=document.createElement('div');t3.style.cssText='font-size:14px;color:rgba(245,240,235,0.45);margin-bottom:8px;line-height:1.6';t3.innerHTML='Voce completou a Selecao Bioflora 2026!<br>Fale com a Wal para resgatar seu premio.';
-  var t4=document.createElement('div');t4.style.cssText='font-size:11px;color:rgba(201,168,76,0.5);margin-bottom:24px;text-transform:uppercase';t4.textContent='1 lugar - R$200';
+  var t3=document.createElement('div');t3.style.cssText='font-size:14px;color:rgba(245,240,235,0.45);margin-bottom:32px;line-height:1.6';t3.innerHTML='Voce completou a Selecao Bioflora 2026!<br><br>Fale com a <strong style="color:#c9a84c">Wal</strong> para retirar o seu premio. 🎁';
+  var t4=document.createElement('div');
   var btn=document.createElement('button');btn.style.cssText='background:linear-gradient(135deg,#e8cc80,#c9a84c);border:none;border-radius:50px;padding:13px 40px;font-family:inherit;font-size:14px;font-weight:900;color:#1a0810;cursor:pointer';btn.textContent='Continuar';btn.onclick=function(){b.remove();};
   [t1,t2,t3,t4,btn].forEach(function(el){b.appendChild(el);});
   document.getElementById('app').appendChild(b);
