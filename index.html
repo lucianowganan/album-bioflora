@@ -20,38 +20,19 @@
 html,body{height:100%;background:var(--wine-bg);font-family:"Maven Pro",sans-serif;color:var(--white);overflow:hidden;touch-action:manipulation}
 body{display:flex;align-items:center;justify-content:center;}
 #app{width:100%;max-width:430px;height:100dvh;min-height:600px;position:relative;overflow:hidden;margin:0 auto;background:var(--wine-bg)}
-
-/* Tablet e Desktop */
-@media(min-width:600px){
-  body{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a0510,#0e0208);}
-  #app{border-radius:20px;box-shadow:0 20px 80px rgba(0,0,0,0.8);height:min(100dvh,820px);max-width:480px;}
-}
-@media(min-width:1024px){
-  #app{max-width:420px;height:min(100dvh - 40px,860px);}
-  body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(140,24,58,0.15),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(46,15,30,0.3),transparent 60%);pointer-events:none;}
-}
-@media(min-width:1200px){
-  body{gap:40px;}
-  .desktop-sidebar{display:flex!important;}
-}
-
-/* Desktop sidebar info panel */
-.desktop-sidebar{
-  display:none;
-  flex-direction:column;
-  gap:16px;
-  width:280px;
-  flex-shrink:0;
-}
+@media(min-width:600px){body{background:linear-gradient(135deg,#1a0510,#0e0208);}#app{border-radius:20px;box-shadow:0 20px 80px rgba(0,0,0,0.8);height:min(100dvh,820px);}}
+@media(min-width:1024px){#app{max-width:420px;height:min(calc(100dvh - 40px),860px);}body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(140,24,58,0.15),transparent 60%);pointer-events:none;}}
+@media(min-width:1200px){body{gap:40px;}.desktop-sidebar{display:flex!important;}}
+.desktop-sidebar{display:none;flex-direction:column;gap:16px;width:260px;flex-shrink:0;}
 .ds-card{background:rgba(36,8,20,0.7);border:1px solid rgba(201,168,76,0.12);border-radius:16px;padding:20px;}
 .ds-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(201,168,76,0.5);margin-bottom:10px;}
 .ds-stat{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
 .ds-stat:last-child{border:none;}
-.ds-ico{font-size:18px;width:28px;text-align:center;}
-.ds-info{flex:1;}
+.ds-ico{font-size:18px;width:28px;text-align:center;}.ds-info{flex:1;}
 .ds-label{font-size:10px;color:rgba(245,240,235,0.4);text-transform:uppercase;font-weight:700;}
 .ds-val{font-size:14px;font-weight:800;color:var(--white);}
-
+#logout-btn{color:rgba(200,80,100,0.4)}
+#logout-btn:hover,#logout-btn:active{color:#ff8aaa;background:rgba(200,48,90,0.15)}
 
 /* ===== AUTH SCREENS ===== */
 .auth-screen{position:absolute;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#3a0820,var(--wine-bg) 55%,#0e0208);padding:24px}
@@ -95,8 +76,6 @@ body{display:flex;align-items:center;justify-content:center;}
 .dock-btn.active::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold)}
 .dock-ico{font-size:19px;line-height:1;transition:transform .2s}
 .dock-btn:hover .dock-ico{transform:scale(1.15) translateY(-1px)}
-#logout-btn{color:rgba(200,80,100,0.4)}
-#logout-btn:hover,#logout-btn:active{color:#ff8aaa;background:rgba(200,48,90,0.15)}
 .dock-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
 
 /* ===== SCREENS ===== */
@@ -295,18 +274,7 @@ body{display:flex;align-items:center;justify-content:center;}
 </head>
 <body>
 <div style="display:contents" id="app-wrapper">
-<div class="desktop-sidebar" id="desktop-sidebar">
-  <div class="ds-card">
-    <div class="ds-title">Seleção Bioflora 2026</div>
-    <div class="ds-stat"><div class="ds-ico">📖</div><div class="ds-info"><div class="ds-label">Figurinhas</div><div class="ds-val" id="ds-collected">—</div></div></div>
-    <div class="ds-stat"><div class="ds-ico">🏆</div><div class="ds-info"><div class="ds-label">Ranking</div><div class="ds-val" id="ds-rank">—</div></div></div>
-    <div class="ds-stat"><div class="ds-ico">📦</div><div class="ds-info"><div class="ds-label">Pacotes</div><div class="ds-val" id="ds-packs">—</div></div></div>
-  </div>
-  <div class="ds-card">
-    <div class="ds-title">Próxima meta</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.5" id="ds-next-goal">Carregando...</div>
-  </div>
-</div>
+<div class="desktop-sidebar" id="desktop-sidebar"><div class="ds-card"><div class="ds-title">Selecao Bioflora 2026</div><div class="ds-stat"><div class="ds-ico">📖</div><div class="ds-info"><div class="ds-label">Figurinhas</div><div class="ds-val" id="ds-collected">—</div></div></div><div class="ds-stat"><div class="ds-ico">🏆</div><div class="ds-info"><div class="ds-label">Ranking</div><div class="ds-val" id="ds-rank">—</div></div></div><div class="ds-stat"><div class="ds-ico">📦</div><div class="ds-info"><div class="ds-label">Pacotes</div><div class="ds-val" id="ds-packs">—</div></div></div></div></div>
 <div id="app">
 
   <!-- LOADING GLOBAL -->
@@ -337,7 +305,7 @@ body{display:flex;align-items:center;justify-content:center;}
       <div class="auth-error" id="reg-error"></div>
       <button class="auth-btn" id="reg-btn">Criar minha conta</button>
       <div class="auth-link">Já tem conta? <span id="go-login">Entrar</span></div>
-      <div class="auth-link" style="margin-top:16px"><span id="go-admin-reg" style="color:rgba(245,240,235,0.25);font-size:10px">Área Admin</span></div>
+      <div class="auth-link" style="margin-top:16px"><span id="go-admin-reg" style="color:rgba(245,240,235,0.2);font-size:10px">Área Admin</span></div>
     </div>
   </div>
 
@@ -352,7 +320,7 @@ body{display:flex;align-items:center;justify-content:center;}
       <div class="auth-error" id="log-error"></div>
       <button class="auth-btn" id="log-btn">Entrar</button>
       <div class="auth-link">Não tem conta? <span id="go-register">Cadastrar</span></div>
-      <div class="auth-link" style="margin-top:16px"><span id="go-admin-login" style="color:rgba(245,240,235,0.25);font-size:10px">Área Admin</span></div>
+      <div class="auth-link" style="margin-top:16px"><span id="go-admin-login" style="color:rgba(245,240,235,0.2);font-size:10px">Área Admin</span></div>
     </div>
   </div>
 
@@ -504,18 +472,11 @@ body{display:flex;align-items:center;justify-content:center;}
         </div>
         <div class="adm-sec">
           <div class="adm-sec-title">Remover bloqueio</div>
-          <div class="adm-card">
-            <select class="adm-select" id="adm-unblock-sel"><option value="">Colaborador...</option></select>
-            <button class="adm-btn btn-g" id="adm-unblock-btn">🔓 Remover bloqueio</button>
-          </div>
+          <div class="adm-card"><select class="adm-select" id="adm-unblock-sel"><option value="">Colaborador...</option></select><button class="adm-btn btn-g" id="adm-unblock-btn">🔓 Remover bloqueio</button></div>
         </div>
         <div class="adm-sec">
-          <div class="adm-sec-title">Dar figurinha específica</div>
-          <div class="adm-card">
-            <select class="adm-select" id="adm-give-fig-user"><option value="">Colaborador...</option></select>
-            <select class="adm-select" id="adm-give-fig-sel"><option value="">Figurinha...</option></select>
-            <button class="adm-btn btn-o" id="adm-give-fig-btn">🃏 Dar figurinha</button>
-          </div>
+          <div class="adm-sec-title">Dar figurinha especifica</div>
+          <div class="adm-card"><select class="adm-select" id="adm-give-fig-user"><option value="">Colaborador...</option></select><select class="adm-select" id="adm-give-fig-sel"><option value="">Figurinha...</option></select><button class="adm-btn btn-o" id="adm-give-fig-btn">🃏 Dar figurinha</button></div>
         </div>
         <div class="adm-sec">
           <div class="adm-sec-title">Confirmar missão manual</div>
@@ -531,11 +492,7 @@ body{display:flex;align-items:center;justify-content:center;}
         </div>
         <div class="adm-sec">
           <div class="adm-sec-title">Excluir jogador</div>
-          <div class="adm-card">
-            <div style="font-size:11px;color:#ff8aaa;margin-bottom:8px">⚠️ Remove conta e todo o histórico do jogador. Irreversível.</div>
-            <select class="adm-select" id="adm-del-user-sel"><option value="">Colaborador...</option></select>
-            <button class="adm-btn btn-r" id="adm-del-user-btn">🗑️ Excluir jogador</button>
-          </div>
+          <div class="adm-card"><div style="font-size:11px;color:#ff8aaa;margin-bottom:8px">Irreversivel.</div><select class="adm-select" id="adm-del-user-sel"><option value="">Colaborador...</option></select><button class="adm-btn btn-r" id="adm-del-user-btn">🗑 Excluir</button></div>
         </div>
         <div class="adm-sec">
           <div class="adm-sec-title">Log de ações</div>
@@ -728,44 +685,23 @@ async function initApp(){
 }
 
 function getBrasiliaDateStr(){
-  // Returns "YYYY-MM-DD" in Brasilia time (UTC-3)
-  var now=new Date();
-  var brasilia=new Date(now.toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));
-  var y=brasilia.getFullYear();
-  var m=String(brasilia.getMonth()+1).padStart(2,'0');
-  var d=String(brasilia.getDate()).padStart(2,'0');
-  return y+'-'+m+'-'+d;
+  var brasilia=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));
+  return brasilia.getFullYear()+'-'+String(brasilia.getMonth()+1).padStart(2,'0')+'-'+String(brasilia.getDate()).padStart(2,'0');
 }
 
 async function checkDailyPack(){
-  var todayBrasilia=getBrasiliaDateStr();
-
-  // ALWAYS fetch fresh from DB — never trust local state for this check
-  var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=ultimo_pacote_diario,pacotes_disponiveis,penalidade_ate');
+  if(!CURRENT_USER||!CURRENT_USER.id)return;
+  var today=getBrasiliaDateStr();
+  var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=penalidade_ate,pacotes_disponiveis,ultimo_pacote_diario');
   if(!fresh||!fresh[0])return;
-  var dbUser=fresh[0];
-
-  // Already got pack today
-  if(dbUser.ultimo_pacote_diario===todayBrasilia){
-    CURRENT_USER.pacotes_disponiveis=dbUser.pacotes_disponiveis;
-    CURRENT_USER.ultimo_pacote_diario=dbUser.ultimo_pacote_diario;
-    return;
-  }
-
-  // Penalized
-  if(dbUser.penalidade_ate&&new Date(dbUser.penalidade_ate)>new Date()){
-    CURRENT_USER.pacotes_disponiveis=dbUser.pacotes_disponiveis;
-    return;
-  }
-
-  // Grant daily pack — use atomic update to prevent race conditions
-  var newPacks=(dbUser.pacotes_disponiveis||0)+1;
-  await db('usuarios?id=eq.'+CURRENT_USER.id,{
-    method:'PATCH',
-    body:{ultimo_pacote_diario:todayBrasilia, pacotes_disponiveis:newPacks}
-  });
+  var u=fresh[0];
+  CURRENT_USER.pacotes_disponiveis=u.pacotes_disponiveis||0;
+  if(u.penalidade_ate&&new Date(u.penalidade_ate)>new Date())return;
+  if(u.ultimo_pacote_diario===today)return;
+  var newPacks=(u.pacotes_disponiveis||0)+1;
+  await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{ultimo_pacote_diario:today,pacotes_disponiveis:newPacks}});
   CURRENT_USER.pacotes_disponiveis=newPacks;
-  CURRENT_USER.ultimo_pacote_diario=todayBrasilia;
+  CURRENT_USER.ultimo_pacote_diario=today;
 }
 
 function checkPenalty(){
@@ -807,24 +743,6 @@ function renderHome(){
   updateDesktopSidebar();
 }
 
-function updateDesktopSidebar(){
-  var ds=$('desktop-sidebar');
-  if(!ds||ds.style.display==='none')return;
-  var collected=USER_COLECAO.filter(function(c){return c.colada;}).length;
-  var packs=CURRENT_USER.pacotes_disponiveis||0;
-  var dsc=$('ds-collected');if(dsc)dsc.textContent=collected+'/36';
-  var dsp=$('ds-packs');if(dsp)dsp.textContent=packs+' disponível'+(packs!==1?'is':'');
-  var dsn=$('ds-next-goal');
-  if(dsn){
-    var pct=Math.round((collected/36)*100);
-    if(pct<25)dsn.textContent='Complete 25% do álbum para ganhar +2 pacotes';
-    else if(pct<50)dsn.textContent='Complete 50% para +1 pacote';
-    else if(pct<75)dsn.textContent='Complete 75% para +2 pacotes';
-    else if(pct<100)dsn.textContent='Quase lá! Complete o álbum para ganhar R$200!';
-    else dsn.textContent='Álbum completo! Fale com a Wal para resgatar o prêmio.';
-  }
-}
-
 async function renderRankBadge(){
   var allCol=await db('colecao?colada=eq.true&select=usuario_id')||[];
   var counts={};
@@ -862,14 +780,8 @@ async function startOpen(){
   packOpening=true;
   $('obtn').disabled=true;
   // Decrement BEFORE opening to prevent spam
-  await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:packs-1}});
+  var ok=await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:packs-1}});
   CURRENT_USER.pacotes_disponiveis=packs-1;
-  // Double-check: verify pack was actually decremented in DB
-  var verify=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=pacotes_disponiveis');
-  if(verify&&verify[0]&&verify[0].pacotes_disponiveis>=packs){
-    // DB didn't update, force it
-    await db('usuarios?id=eq.'+CURRENT_USER.id,{method:'PATCH',body:{pacotes_disponiveis:packs-1}});
-  }
   $('overlay').classList.add('show');
   $('pphase').style.display='flex';
   $('rphase').classList.remove('show');
@@ -877,10 +789,8 @@ async function startOpen(){
   $('phint').textContent='Toque para abrir';
 }
 
-var revealFired=false;
 function shakePack(){
-  if(!packOpening)return;
-  if(revealFired)return;
+  if(!packOpening||revealFired)return;
   shakes++;
   var pw=$('pwrap');pw.classList.remove('shake');void pw.offsetWidth;pw.classList.add('shake');
   if(shakes===1)$('phint').textContent='Mais uma vez!';
@@ -918,9 +828,7 @@ async function doReveal(){
   }
   await db('pacotes',{method:'POST',body:{usuario_id:CURRENT_USER.id,figurinhas_obtidas:pack.map(function(f){return f.id;}),origem:'diario'}});
   await checkAutoMissions();
-  var p=CURRENT_USER.pacotes_disponiveis;
-  $('pavail').textContent=p>0?p+' pacote'+(p!==1?'s':'')+' disponível'+(p!==1?'is':''):'Nenhum pacote disponível';
-  $('obtn').disabled=p<=0;
+  $('pavail').textContent=CURRENT_USER.pacotes_disponiveis+' pacote'+(CURRENT_USER.pacotes_disponiveis!==1?'s':'')+' disponível'+(CURRENT_USER.pacotes_disponiveis!==1?'is':'');
 }
 
 function rarityEmoji(r){return {comum:'👤',rara:'🥉',epica:'🥈',lendaria:'👑',especial:'🌟'}[r]||'👤';}
@@ -955,8 +863,8 @@ function generatePack(){
 async function closeOv(){
   $('overlay').classList.remove('show');
   packOpening=false;
-  // Don't re-fetch user here — pack count was already decremented in startOpen
-  // Re-fetching can return stale data and restore the pack count
+  var fresh=await db('usuarios?id=eq.'+CURRENT_USER.id+'&select=*');
+  if(fresh&&fresh[0])CURRENT_USER=fresh[0];
   USER_COLECAO=await db('colecao?select=*,figurinhas(*)&usuario_id=eq.'+CURRENT_USER.id)||[];
   renderHome();buildAlbum();renderInventory();renderGoals();
 }
@@ -996,30 +904,10 @@ async function checkAutoMissions(){
   if(hasLend)await completeMissao('primeira_lendaria');
   var allLend=ALL_FIGURINHAS.filter(function(f){return f.raridade==='lendaria';});
   if(allLend.length>0&&allLend.every(function(f){return USER_COLECAO.find(function(c){return c.figurinha_id===f.id;});}))await completeMissao('todas_lendarias');
-  // Check categoria_completa: any full category
   var cats=['colaboradores','raras','epicas','lendarias','especiais'];
-  var anyComplete=cats.some(function(cat){
-    var catFigs=ALL_FIGURINHAS.filter(function(f){return f.categoria===cat;});
-    return catFigs.length>0&&catFigs.every(function(f){return USER_COLECAO.find(function(c){return c.figurinha_id===f.id&&c.colada;});});
-  });
+  var anyComplete=cats.some(function(cat){var cf=ALL_FIGURINHAS.filter(function(f){return f.categoria===cat;});return cf.length>0&&cf.every(function(f){return USER_COLECAO.find(function(c){return c.figurinha_id===f.id&&c.colada;});});});
   if(anyComplete)await completeMissao('categoria_completa');
-  // Check album 100% complete
   if(pct>=1)showAlbumComplete();
-}
-
-function showAlbumComplete(){
-  if(document.getElementById("album-complete-banner"))return;
-  var banner=document.createElement("div");
-  banner.id="album-complete-banner";
-  banner.style.cssText="position:fixed;inset:0;background:rgba(8,1,5,0.96);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center";
-  var t1=document.createElement("div");t1.style.fontSize="64px";t1.style.marginBottom="16px";t1.textContent="🏆";
-  var t2=document.createElement("div");t2.style.cssText="font-size:24px;font-weight:900;color:#c9a84c;margin-bottom:8px";t2.textContent="ALBUM COMPLETO!";
-  var t3=document.createElement("div");t3.style.cssText="font-size:14px;color:rgba(245,240,235,0.45);margin-bottom:8px;line-height:1.6";t3.innerHTML="Voce completou a Selecao Bioflora 2026!<br>Fale com a Wal para resgatar seu premio.";
-  var t4=document.createElement("div");t4.style.cssText="font-size:11px;color:rgba(201,168,76,0.5);margin-bottom:24px;text-transform:uppercase;letter-spacing:1px";t4.textContent="1 lugar - R$200";
-  var btn=document.createElement("button");btn.style.cssText="background:linear-gradient(135deg,#e8cc80,#c9a84c);border:none;border-radius:50px;padding:13px 40px;font-family:inherit;font-size:14px;font-weight:900;color:#1a0810;cursor:pointer";btn.textContent="Continuar";
-  btn.onclick=function(){banner.remove();};
-  [t1,t2,t3,t4,btn].forEach(function(el){banner.appendChild(el);});
-  document.getElementById("app").appendChild(banner);
 }
 
 var ALBUM_PAGES=[
@@ -1101,88 +989,51 @@ function renderTrades(){renderIncomingTrades();renderSentTrades();renderRepeatLi
 
 function renderIncomingTrades(){
   var panel=$('tp-rec');panel.innerHTML='';
-  if(!TROCAS_RECEBIDAS||TROCAS_RECEBIDAS.length===0){
-    panel.innerHTML='<div class="empty-state">Nenhuma proposta recebida</div>';return;
-  }
+  if(!TROCAS_RECEBIDAS||TROCAS_RECEBIDAS.length===0){panel.innerHTML='<div class="empty-state">Nenhuma proposta recebida</div>';return;}
   TROCAS_RECEBIDAS.forEach(function(t){
     var card=document.createElement('div');card.className='trade-card incoming';
-    // Find the figurinhas involved
-    var figOferece=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_oferecida;});
-    var figDeseja=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_desejada;});
-    var solicitante=ALL_USERS.find(function(u){return u.id===t.solicitante_id;});
-    var nomeSol=solicitante?solicitante.nome_completo:'Colega';
-
-    // Check if I actually have the desired figurinha
+    var figO=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_oferecida;});
+    var figD=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_desejada;});
+    var sol=ALL_USERS.find(function(u){return u.id===t.solicitante_id;});
     var euTenho=USER_COLECAO.find(function(c){return c.figurinha_id===t.figurinha_desejada&&c.colada&&c.quantidade>=1;});
-    var imgOferece=figOferece?getImgSrc(figOferece):null;
-    var imgDeseja=figDeseja?getImgSrc(figDeseja):null;
-
-    var thumbO=imgOferece?'<img src="'+imgOferece+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figOferece?rarityEmoji(figOferece.raridade):'?')+'</div>';
-    var thumbD=imgDeseja?'<img src="'+imgDeseja+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figDeseja?rarityEmoji(figDeseja.raridade):'?')+'</div>';
-
-    var warningHtml=!euTenho?'<div style="font-size:10px;color:#ff8aaa;margin-top:8px;font-weight:700">⚠️ Você não tem essa figurinha mais</div>':'';
-
-    card.innerHTML=
-      '<div class="trade-hdr"><div class="trade-from">📨 '+nomeSol+' quer trocar</div><div class="trade-time">'+timeAgo(t.criada_em)+'</div></div>'+
-      '<div class="tcards-row" style="align-items:flex-start;gap:12px;margin:10px 0">'+
-        '<div style="text-align:center;flex:1">'+
-          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(201,168,76,0.3)">'+thumbO+'</div>'+
-          '<div style="font-size:10px;font-weight:700;color:var(--gold)">Oferece</div>'+
-          '<div style="font-size:10px;color:var(--white);">'+(figOferece?figOferece.nome:'?')+'</div>'+
-        '</div>'+
-        '<div style="font-size:24px;color:var(--gold);padding-top:28px">⇄</div>'+
-        '<div style="text-align:center;flex:1">'+
-          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(255,255,255,0.15)">'+thumbD+'</div>'+
-          '<div style="font-size:10px;font-weight:700;color:var(--muted)">Quer de você</div>'+
-          '<div style="font-size:10px;color:var(--white)">'+(figDeseja?figDeseja.nome:'?')+'</div>'+
-        '</div>'+
-      '</div>'+
-      warningHtml+
-      '<div class="tactions">'+
-        (euTenho?'<button class="t-acc" data-id="'+t.id+'">✓ Aceitar</button>':'')+
-        '<button class="t-rej" data-id="'+t.id+'">✕ Recusar</button>'+
-      '</div>';
+    var iO=figO?getImgSrc(figO):null;var iD=figD?getImgSrc(figD):null;
+    var tO=iO?'<img src="'+iO+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figO?rarityEmoji(figO.raridade):'?')+'</div>';
+    var tD=iD?'<img src="'+iD+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figD?rarityEmoji(figD.raridade):'?')+'</div>';
+    var warn=!euTenho?'<div style="font-size:10px;color:#ff8aaa;margin-top:6px;font-weight:700">⚠ Voce nao tem essa figurinha mais</div>':'';
+    card.innerHTML='<div class="trade-hdr"><div class="trade-from">📨 '+(sol?sol.nome_completo:'Colega')+' quer trocar</div><div class="trade-time">'+timeAgo(t.criada_em)+'</div></div>'+
+      '<div style="display:flex;align-items:flex-start;gap:12px;margin:10px 0">'+
+      '<div style="text-align:center;flex:1"><div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(201,168,76,0.3)">'+tO+'</div><div style="font-size:10px;font-weight:700;color:var(--gold)">Oferece</div><div style="font-size:10px;color:var(--white)">'+(figO?figO.nome:'?')+'</div></div>'+
+      '<div style="font-size:22px;color:var(--gold);padding-top:28px">⇄</div>'+
+      '<div style="text-align:center;flex:1"><div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(255,255,255,0.15)">'+tD+'</div><div style="font-size:10px;font-weight:700;color:var(--muted)">Quer de voce</div><div style="font-size:10px;color:var(--white)">'+(figD?figD.nome:'?')+'</div></div>'+
+      '</div>'+warn+
+      '<div class="tactions">'+(euTenho?'<button class="t-acc" data-id="'+t.id+'">✓ Aceitar</button>':'')+'<button class="t-rej" data-id="'+t.id+'">✕ Recusar</button></div>';
     panel.appendChild(card);
   });
-  panel.querySelectorAll('.t-acc').forEach(function(btn){btn.onclick=function(){executarTroca(btn.dataset.id);};});
-  panel.querySelectorAll('.t-rej').forEach(function(btn){btn.onclick=function(){respondTrade(btn.dataset.id,'recusada');};});
+  panel.querySelectorAll('.t-acc').forEach(function(b){b.onclick=function(){executarTroca(b.dataset.id);};});
+  panel.querySelectorAll('.t-rej').forEach(function(b){b.onclick=function(){respondTrade(b.dataset.id,'recusada');};});
 }
 
 function renderSentTrades(){
   var panel=$('tp-env');panel.innerHTML='';
-  if(!TROCAS_ENVIADAS||TROCAS_ENVIADAS.length===0){
-    panel.innerHTML='<div class="empty-state">Nenhuma proposta enviada</div>';return;
-  }
+  if(!TROCAS_ENVIADAS||TROCAS_ENVIADAS.length===0){panel.innerHTML='<div class="empty-state">Nenhuma proposta enviada</div>';return;}
   TROCAS_ENVIADAS.forEach(function(t){
     var card=document.createElement('div');card.className='trade-card';
-    var figOferece=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_oferecida;});
-    var figDeseja=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_desejada;});
-    var destinatario=ALL_USERS.find(function(u){return u.id===t.destinatario_id;});
-    var nomeDest=destinatario?destinatario.nome_completo:'Colega';
-    var imgO=figOferece?getImgSrc(figOferece):null;
-    var imgD=figDeseja?getImgSrc(figDeseja):null;
-    var thumbO=imgO?'<img src="'+imgO+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figOferece?rarityEmoji(figOferece.raridade):'?')+'</div>';
-    var thumbD=imgD?'<img src="'+imgD+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figDeseja?rarityEmoji(figDeseja.raridade):'?')+'</div>';
-
-    card.innerHTML=
-      '<div class="trade-hdr"><div class="trade-from">📤 Para '+nomeDest+'</div><div class="sent-badge">Aguardando</div></div>'+
-      '<div class="tcards-row" style="align-items:flex-start;gap:12px;margin:10px 0">'+
-        '<div style="text-align:center;flex:1">'+
-          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(201,168,76,0.3)">'+thumbO+'</div>'+
-          '<div style="font-size:10px;font-weight:700;color:var(--gold)">Você oferece</div>'+
-          '<div style="font-size:10px;color:var(--white)">'+(figOferece?figOferece.nome:'?')+'</div>'+
-        '</div>'+
-        '<div style="font-size:24px;color:var(--gold);padding-top:28px">⇄</div>'+
-        '<div style="text-align:center;flex:1">'+
-          '<div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(255,255,255,0.15)">'+thumbD+'</div>'+
-          '<div style="font-size:10px;font-weight:700;color:var(--muted)">Você quer</div>'+
-          '<div style="font-size:10px;color:var(--white)">'+(figDeseja?figDeseja.nome:'?')+'</div>'+
-        '</div>'+
+    var figO=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_oferecida;});
+    var figD=ALL_FIGURINHAS.find(function(f){return f.id===t.figurinha_desejada;});
+    var dest=ALL_USERS.find(function(u){return u.id===t.destinatario_id;});
+    var iO=figO?getImgSrc(figO):null;var iD=figD?getImgSrc(figD):null;
+    var tO=iO?'<img src="'+iO+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figO?rarityEmoji(figO.raridade):'?')+'</div>';
+    var tD=iD?'<img src="'+iD+'" style="width:100%;height:100%;object-fit:cover">':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">'+(figD?rarityEmoji(figD.raridade):'?')+'</div>';
+    card.innerHTML='<div class="trade-hdr"><div class="trade-from">📤 Para '+(dest?dest.nome_completo:'Colega')+'</div><div class="sent-badge">Aguardando</div></div>'+
+      '<div style="display:flex;align-items:flex-start;gap:12px;margin:10px 0">'+
+      '<div style="text-align:center;flex:1"><div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(201,168,76,0.3)">'+tO+'</div><div style="font-size:10px;font-weight:700;color:var(--gold)">Voce oferece</div><div style="font-size:10px;color:var(--white)">'+(figO?figO.nome:'?')+'</div></div>'+
+      '<div style="font-size:22px;color:var(--gold);padding-top:28px">⇄</div>'+
+      '<div style="text-align:center;flex:1"><div style="width:60px;height:84px;border-radius:8px;overflow:hidden;margin:0 auto 4px;border:2px solid rgba(255,255,255,0.15)">'+tD+'</div><div style="font-size:10px;font-weight:700;color:var(--muted)">Voce quer</div><div style="font-size:10px;color:var(--white)">'+(figD?figD.nome:'?')+'</div></div>'+
       '</div>'+
       '<div class="tactions"><button class="t-rej" data-id="'+t.id+'">✕ Cancelar</button></div>';
     panel.appendChild(card);
   });
-  panel.querySelectorAll('.t-rej').forEach(function(btn){btn.onclick=function(){respondTrade(btn.dataset.id,'cancelada');};});
+  panel.querySelectorAll('.t-rej').forEach(function(b){b.onclick=function(){respondTrade(b.dataset.id,'cancelada');};});
 }
 
 function renderRepeatList(){
@@ -1195,8 +1046,8 @@ function renderRepeatList(){
     var card=document.createElement('div');card.className='sel-card'+(selectedRepeat===fig.id?' chosen':'');
     card.dataset.figId=fig.id;
     var imgSrc=getImgSrc(fig);
-    var thumbHtml=imgSrc?'<img src="'+imgSrc+'" style="width:40px;height:56px;object-fit:cover;border-radius:5px">':'<div style="width:40px;height:56px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--wine-card);border-radius:5px">'+rarityEmoji(fig.raridade)+'</div>';
-    card.innerHTML=thumbHtml+'<div class="rdot rc-'+fig.raridade+'"></div><div style="flex:1"><div class="iname">'+fig.nome+'</div><div class="irole">'+item.quantidade+'x repetida</div></div>';
+    var th=imgSrc?'<img src="'+imgSrc+'" style="width:40px;height:56px;object-fit:cover;border-radius:5px">':'<div style="width:40px;height:56px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--wine-card);border-radius:5px">'+rarityEmoji(fig.raridade)+'</div>';
+    card.innerHTML=th+'<div class="rdot rc-'+fig.raridade+'"></div><div style="flex:1"><div class="iname">'+fig.nome+'</div><div class="irole">'+item.quantidade+'x repetida</div></div>';
     card.onclick=function(){selectedRepeat=fig.id;document.querySelectorAll('.sel-card').forEach(function(c){c.classList.remove('chosen');});card.classList.add('chosen');loadTradeForm();};
     list.appendChild(card);
   });
@@ -1205,28 +1056,17 @@ function renderRepeatList(){
 
 async function loadTradeForm(){
   $('trade-form').style.display='block';
-
-  // What I want: only figurinhas I don't have colada
   var wantSel=$('trade-want-sel');
   wantSel.innerHTML='<option value="">O que quer em troca?</option>';
   ALL_FIGURINHAS.forEach(function(f){
     var have=USER_COLECAO.find(function(c){return c.figurinha_id===f.id&&c.colada;});
-    if(!have){
-      var opt=document.createElement('option');
-      opt.value=f.id;
-      opt.textContent='#'+f.numero_album+' '+f.nome+' ('+f.raridade+')';
-      wantSel.appendChild(opt);
-    }
+    if(!have){var opt=document.createElement('option');opt.value=f.id;opt.textContent='#'+f.numero_album+' '+f.nome+' ('+f.raridade+')';wantSel.appendChild(opt);}
   });
-
-  // Target: other users
   var targetSel=$('trade-target-sel');
   targetSel.innerHTML='<option value="">Selecionar colaborador...</option>';
   ALL_USERS.filter(function(u){return u.id!==CURRENT_USER.id;}).forEach(function(u){
     var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.nome_completo;targetSel.appendChild(opt);
   });
-
-  // When target changes, validate if they have what I want
   targetSel.onchange=function(){validateTradeTarget();};
   wantSel.onchange=function(){validateTradeTarget();};
 }
@@ -1234,127 +1074,63 @@ async function loadTradeForm(){
 async function validateTradeTarget(){
   var destId=$('trade-target-sel').value;
   var figId=parseInt($('trade-want-sel').value);
-  var hint=$('trade-validation-hint');
-  if(!hint)return;
-  if(!destId||!figId){hint.textContent='';return;}
-
-  // Check if target user has the desired figurinha
+  var hint=$('trade-validation-hint');if(!hint)return;
+  if(!destId||!figId){hint.textContent='';$('send-trade-btn').disabled=false;return;}
   var targetCol=await db('colecao?usuario_id=eq.'+destId+'&figurinha_id=eq.'+figId+'&select=quantidade');
   var fig=ALL_FIGURINHAS.find(function(f){return f.id===figId;});
   var user=ALL_USERS.find(function(u){return u.id===destId;});
   if(targetCol&&targetCol.length>0&&targetCol[0].quantidade>0){
-    hint.textContent='✓ '+user.nome_completo+' tem essa figurinha!';
-    hint.style.color='#80ff80';
-    $('send-trade-btn').disabled=false;
+    hint.textContent='✓ '+user.nome_completo+' tem essa figurinha!';hint.style.color='#80ff80';$('send-trade-btn').disabled=false;
   }else{
-    hint.textContent='✗ '+user.nome_completo+' não tem essa figurinha';
-    hint.style.color='#ff8aaa';
-    $('send-trade-btn').disabled=true;
+    hint.textContent='✗ '+user.nome_completo+' nao tem essa figurinha';hint.style.color='#ff8aaa';$('send-trade-btn').disabled=true;
   }
 }
 
 async function sendTrade(){
-  var figOferece=selectedRepeat;
-  var figDeseja=parseInt($('trade-want-sel').value);
-  var destId=$('trade-target-sel').value;
+  var figOferece=selectedRepeat,figDeseja=parseInt($('trade-want-sel').value),destId=$('trade-target-sel').value;
   if(!figOferece){toast('Selecione uma figurinha para oferecer','error');return;}
   if(!figDeseja){toast('Selecione o que quer em troca','error');return;}
   if(!destId){toast('Selecione um colaborador','error');return;}
-  if(TROCAS_ENVIADAS.length>=3){toast('Máximo 3 propostas abertas','error');return;}
-
-  // Final validation: does target have the desired figurinha?
+  if(TROCAS_ENVIADAS.length>=3){toast('Maximo 3 propostas abertas','error');return;}
   var targetCol=await db('colecao?usuario_id=eq.'+destId+'&figurinha_id=eq.'+figDeseja+'&select=quantidade');
-  if(!targetCol||targetCol.length===0||targetCol[0].quantidade<1){
-    toast('Esse colaborador não tem essa figurinha','error');return;
-  }
-  // Does I still have the offered figurinha (repeated)?
+  if(!targetCol||targetCol.length===0||targetCol[0].quantidade<1){toast('Esse colaborador nao tem essa figurinha','error');return;}
   var myFig=USER_COLECAO.find(function(c){return c.figurinha_id===figOferece;});
-  if(!myFig||myFig.quantidade<2){
-    toast('Você não tem repetida essa figurinha','error');return;
-  }
-
+  if(!myFig||myFig.quantidade<2){toast('Voce nao tem essa figurinha repetida','error');return;}
   $('send-trade-btn').disabled=true;
-  await db('trocas',{method:'POST',body:{
-    solicitante_id:CURRENT_USER.id,
-    destinatario_id:destId,
-    figurinha_oferecida:figOferece,
-    figurinha_desejada:figDeseja
-  }});
+  await db('trocas',{method:'POST',body:{solicitante_id:CURRENT_USER.id,destinatario_id:destId,figurinha_oferecida:figOferece,figurinha_desejada:figDeseja}});
   await completeMissao('primeira_troca');
   toast('Proposta enviada!','success');
-  $('send-trade-btn').disabled=false;
-  selectedRepeat=null;
+  $('send-trade-btn').disabled=false;selectedRepeat=null;
   TROCAS_ENVIADAS=await db('trocas?select=*&solicitante_id=eq.'+CURRENT_USER.id+'&status=eq.pendente')||[];
   renderSentTrades();showTTab('env',$('tt-env'));
 }
 
 async function executarTroca(tradeId){
   var trade=TROCAS_RECEBIDAS.find(function(t){return t.id==tradeId;});
-  if(!trade){toast('Proposta não encontrada','error');return;}
-
-  var figOferece=trade.figurinha_oferecida; // solicitante oferece
-  var figDeseja=trade.figurinha_desejada;   // solicitante quer (eu tenho)
-  var solId=trade.solicitante_id;
-  var myId=CURRENT_USER.id;
-
-  // Validate: solicitante still has figOferece
-  var solCol=await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece+'&select=quantidade,colada');
-  if(!solCol||solCol.length===0||solCol[0].quantidade<1){
-    toast('Solicitante não tem mais essa figurinha','error');
-    await respondTrade(tradeId,'cancelada');return;
-  }
-  // Validate: eu still have figDeseja
+  if(!trade){toast('Proposta nao encontrada','error');return;}
+  var figOferece=trade.figurinha_oferecida,figDeseja=trade.figurinha_desejada,solId=trade.solicitante_id,myId=CURRENT_USER.id;
+  var solCol=await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece+'&select=quantidade');
+  if(!solCol||solCol.length===0||solCol[0].quantidade<1){toast('Solicitante nao tem mais essa figurinha','error');await respondTrade(tradeId,'cancelada');return;}
   var myCol=USER_COLECAO.find(function(c){return c.figurinha_id===figDeseja;});
-  if(!myCol||myCol.quantidade<1){
-    toast('Você não tem mais essa figurinha','error');
-    await respondTrade(tradeId,'cancelada');return;
-  }
-
-  // Execute the swap:
-  // 1. Remove 1x figOferece from solicitante
-  var solNewQty=solCol[0].quantidade-1;
-  if(solNewQty<=0){
-    await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece,{method:'DELETE',noparse:true});
-  }else{
-    await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece,{method:'PATCH',body:{quantidade:solNewQty}});
-  }
-
-  // 2. Remove 1x figDeseja from me
-  var myNewQty=myCol.quantidade-1;
-  if(myNewQty<=0){
-    await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figDeseja,{method:'DELETE',noparse:true});
-    USER_COLECAO=USER_COLECAO.filter(function(c){return c.figurinha_id!==figDeseja;});
-  }else{
-    await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figDeseja,{method:'PATCH',body:{quantidade:myNewQty}});
-    myCol.quantidade=myNewQty;
-  }
-
-  // 3. Add figOferece to me (I receive what solicitante offered)
-  var iAlreadyHave=USER_COLECAO.find(function(c){return c.figurinha_id===figOferece;});
-  if(iAlreadyHave){
-    await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figOferece,{method:'PATCH',body:{quantidade:iAlreadyHave.quantidade+1}});
-    iAlreadyHave.quantidade++;
-  }else{
-    await db('colecao',{method:'POST',body:{usuario_id:myId,figurinha_id:figOferece,quantidade:1,colada:true}});
-    var figData=ALL_FIGURINHAS.find(function(f){return f.id===figOferece;});
-    USER_COLECAO.push({usuario_id:myId,figurinha_id:figOferece,quantidade:1,colada:true,figurinhas:figData});
-  }
-
-  // 4. Add figDeseja to solicitante
-  var solAlreadyHas=await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figDeseja+'&select=quantidade');
-  if(solAlreadyHas&&solAlreadyHas.length>0){
-    await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figDeseja,{method:'PATCH',body:{quantidade:solAlreadyHas[0].quantidade+1}});
-  }else{
-    await db('colecao',{method:'POST',body:{usuario_id:solId,figurinha_id:figDeseja,quantidade:1,colada:true}});
-  }
-
-  // 5. Mark trade as accepted
+  if(!myCol||myCol.quantidade<1){toast('Voce nao tem mais essa figurinha','error');await respondTrade(tradeId,'cancelada');return;}
+  // Remove figOferece from solicitante
+  var sq=solCol[0].quantidade-1;
+  if(sq<=0)await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece,{method:'DELETE',noparse:true});
+  else await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figOferece,{method:'PATCH',body:{quantidade:sq}});
+  // Remove figDeseja from me
+  var mq=myCol.quantidade-1;
+  if(mq<=0){await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figDeseja,{method:'DELETE',noparse:true});USER_COLECAO=USER_COLECAO.filter(function(c){return c.figurinha_id!==figDeseja;});}
+  else{await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figDeseja,{method:'PATCH',body:{quantidade:mq}});myCol.quantidade=mq;}
+  // Add figOferece to me
+  var iHave=USER_COLECAO.find(function(c){return c.figurinha_id===figOferece;});
+  if(iHave){await db('colecao?usuario_id=eq.'+myId+'&figurinha_id=eq.'+figOferece,{method:'PATCH',body:{quantidade:iHave.quantidade+1}});iHave.quantidade++;}
+  else{await db('colecao',{method:'POST',body:{usuario_id:myId,figurinha_id:figOferece,quantidade:1,colada:true}});var fd=ALL_FIGURINHAS.find(function(f){return f.id===figOferece;});USER_COLECAO.push({usuario_id:myId,figurinha_id:figOferece,quantidade:1,colada:true,figurinhas:fd});}
+  // Add figDeseja to solicitante
+  var sHas=await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figDeseja+'&select=quantidade');
+  if(sHas&&sHas.length>0)await db('colecao?usuario_id=eq.'+solId+'&figurinha_id=eq.'+figDeseja,{method:'PATCH',body:{quantidade:sHas[0].quantidade+1}});
+  else await db('colecao',{method:'POST',body:{usuario_id:solId,figurinha_id:figDeseja,quantidade:1,colada:true}});
+  // Mark trade done
   await db('trocas?id=eq.'+tradeId,{method:'PATCH',body:{status:'aceita',respondida_em:new Date().toISOString()}});
-
-  // Check 5 trocas mission
-  var trocasDone=await db('trocas?select=id&status=eq.aceita&or=(solicitante_id.eq.'+myId+',destinatario_id.eq.'+myId+')');
-  if(trocasDone&&trocasDone.length>=5)await completeMissao('5_trocas');
-
   TROCAS_RECEBIDAS=TROCAS_RECEBIDAS.filter(function(t){return t.id!=tradeId;});
   USER_COLECAO=await db('colecao?select=*,figurinhas(*)&usuario_id=eq.'+myId)||[];
   renderIncomingTrades();renderInventory();buildAlbum();
@@ -1419,7 +1195,7 @@ async function renderRanking(){
 
 async function loadAdminData(){
   // Populate user selects
-  ['adm-pack-sel','adm-pen-sel','adm-unblock-sel','adm-mis-col','adm-give-fig-user','adm-del-user-sel'].forEach(function(selId){
+  ['adm-pack-sel','adm-pen-sel','adm-unblock-sel','adm-mis-col','adm-give-fig-user'].forEach(function(selId){
     var sel=$(selId);if(!sel)return;
     sel.innerHTML='<option value="">Colaborador...</option>';
     ALL_USERS.forEach(function(u){var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.nome_completo+(u.penalidade_ate&&new Date(u.penalidade_ate)>new Date()?' 🔒':'');sel.appendChild(opt);});
@@ -1449,18 +1225,19 @@ async function loadAdminData(){
 
 async function admGivepack(){
   var uid=$('adm-pack-sel').value;if(!uid){toast('Selecione colaborador','error');return;}
-  // Fetch current value from DB to avoid stale state
   var fresh=await db('usuarios?id=eq.'+uid+'&select=pacotes_disponiveis,nome_completo');
   if(!fresh||!fresh[0]){toast('Usuário não encontrado','error');return;}
-  var currentPacks=fresh[0].pacotes_disponiveis||0;
-  var res=await db('usuarios?id=eq.'+uid,{method:'PATCH',prefer:'return=representation',body:{pacotes_disponiveis:currentPacks+1}});
-  if(res&&res[0]){
+  var nome=fresh[0].nome_completo;
+  var novo=(fresh[0].pacotes_disponiveis||0)+1;
+  await db('usuarios?id=eq.'+uid,{method:'PATCH',body:{pacotes_disponiveis:novo}});
+  var check=await db('usuarios?id=eq.'+uid+'&select=pacotes_disponiveis');
+  if(check&&check[0]&&check[0].pacotes_disponiveis===novo){
     var user=ALL_USERS.find(function(u){return u.id===uid;});
-    if(user)user.pacotes_disponiveis=res[0].pacotes_disponiveis;
-    admAddLog('Pacote liberado para '+fresh[0].nome_completo+' (total: '+res[0].pacotes_disponiveis+')');
-    toast('✓ Pacote liberado para '+fresh[0].nome_completo+'!','success');
+    if(user)user.pacotes_disponiveis=novo;
+    admAddLog('Pacote liberado para '+nome+' (total: '+novo+')');
+    toast('✓ '+nome+' tem '+novo+' pacote'+(novo!==1?'s':''),'success');
   }else{
-    toast('Erro ao liberar pacote','error');
+    toast('Erro ao salvar. Tente novamente.','error');
   }
 }
 
@@ -1539,39 +1316,6 @@ function timeAgo(dateStr){
   if(h<1)return 'agora';if(h<24)return 'há '+h+'h';return 'há '+Math.floor(h/24)+'d';
 }
 
-function openAdminDirect(){
-  // Show admin panel without login - just for admin access
-  showScreen_auth('main');
-  $('main').style.display='flex';$('main').classList.remove('hidden');
-  // Show all screens hidden, show only admin
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  $('admin').classList.add('active');
-  // Minimal state so admin panel loads
-  CURRENT_USER={id:'admin-direct',nome_completo:'Admin',setor:'Admin',pacotes_disponiveis:0};
-  // Show admin login
-  $('adm-login-wrap').style.display='flex';$('adm-panel').style.display='none';
-  document.querySelectorAll('.dock-btn').forEach(function(b){b.classList.remove('active');});
-  var admBtn=document.querySelector('[data-screen="admin"]');if(admBtn)admBtn.classList.add('active');
-}
-
-async function admDeleteUser(){
-  var uid=$('adm-del-user-sel').value;
-  if(!uid){toast('Selecione colaborador','error');return;}
-  var user=ALL_USERS.find(function(u){return u.id===uid;});
-  if(!confirm("Excluir conta de "+user.nome_completo+"? Isso e irreversivel. Nao pode ser desfeito.")){return;}
-  // Delete in order: colecao, pacotes, missoes_completadas, trocas, then usuario
-  await db('colecao?usuario_id=eq.'+uid,{method:'DELETE',noparse:true});
-  await db('pacotes?usuario_id=eq.'+uid,{method:'DELETE',noparse:true});
-  await db('missoes_completadas?usuario_id=eq.'+uid,{method:'DELETE',noparse:true});
-  await db('trocas?solicitante_id=eq.'+uid,{method:'DELETE',noparse:true});
-  await db('trocas?destinatario_id=eq.'+uid,{method:'DELETE',noparse:true});
-  await db('usuarios?id=eq.'+uid,{method:'DELETE',noparse:true});
-  ALL_USERS=ALL_USERS.filter(function(u){return u.id!==uid;});
-  admAddLog('Conta de '+user.nome_completo+' excluída');
-  toast('✓ Conta excluída','success');
-  await loadAdminData();
-}
-
 document.addEventListener('DOMContentLoaded',async function(){
   showLoading(true);
   if(typeof FIGS!=='undefined'){
@@ -1605,29 +1349,10 @@ document.addEventListener('DOMContentLoaded',async function(){
   $('adm-give-fig-btn').onclick=admGiveFig;
   $('adm-mis-btn').onclick=admConfirmMission;
   $('adm-del-user-btn').onclick=admDeleteUser;
-
-  // Logout
-  $('logout-btn').onclick=function(){
-    if(confirm('Deseja sair da sua conta?')){
-      localStorage.removeItem('bf_user_id');
-      location.reload();
-    }
-  };
-
-  // Logo tap -> open admin when logged in
-  var logoTrigger=$('logo-admin-trigger');
-  if(logoTrigger){
-    logoTrigger.onclick=function(){
-      showScreen('admin');
-      document.querySelectorAll('.dock-btn').forEach(function(b){b.classList.remove('active');});
-    };
-  }
-
-  // Admin link on login/register screens
-  var goAdmLogin=$('go-admin-login');
-  if(goAdmLogin)goAdmLogin.onclick=function(){openAdminDirect();};
-  var goAdmReg=$('go-admin-reg');
-  if(goAdmReg)goAdmReg.onclick=function(){openAdminDirect();};
+  $('logout-btn').onclick=function(){if(confirm('Deseja sair?')){localStorage.removeItem('bf_user_id');location.reload();}};
+  var lt=$('logo-admin-trigger');if(lt)lt.onclick=function(){showScreen('admin');};
+  var ga=$('go-admin-login');if(ga)ga.onclick=openAdminDirect;
+  var gr=$('go-admin-reg');if(gr)gr.onclick=openAdminDirect;
 
   showLoading(true);
   var loggedIn=await autoLogin();
@@ -1635,6 +1360,49 @@ document.addEventListener('DOMContentLoaded',async function(){
   else{showLoading(false);showScreen_auth('screen-login');}
 });
 
+function updateDesktopSidebar(){
+  var collected=USER_COLECAO.filter(function(c){return c.colada;}).length;
+  var packs=CURRENT_USER.pacotes_disponiveis||0;
+  var dsc=$('ds-collected');if(dsc)dsc.textContent=collected+'/36';
+  var dsp=$('ds-packs');if(dsp)dsp.textContent=packs>0?packs+' disp':'Nenhum';
+}
+function showAlbumComplete(){
+  if(document.getElementById('album-complete-banner'))return;
+  var b=document.createElement('div');b.id='album-complete-banner';
+  b.style.cssText='position:fixed;inset:0;background:rgba(8,1,5,0.96);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center';
+  var t1=document.createElement('div');t1.style.cssText='font-size:64px;margin-bottom:16px';t1.textContent='🏆';
+  var t2=document.createElement('div');t2.style.cssText='font-size:24px;font-weight:900;color:#c9a84c;margin-bottom:8px';t2.textContent='ALBUM COMPLETO!';
+  var t3=document.createElement('div');t3.style.cssText='font-size:14px;color:rgba(245,240,235,0.45);margin-bottom:8px;line-height:1.6';t3.innerHTML='Voce completou a Selecao Bioflora 2026!<br>Fale com a Wal para resgatar seu premio.';
+  var t4=document.createElement('div');t4.style.cssText='font-size:11px;color:rgba(201,168,76,0.5);margin-bottom:24px;text-transform:uppercase';t4.textContent='1 lugar - R$200';
+  var btn=document.createElement('button');btn.style.cssText='background:linear-gradient(135deg,#e8cc80,#c9a84c);border:none;border-radius:50px;padding:13px 40px;font-family:inherit;font-size:14px;font-weight:900;color:#1a0810;cursor:pointer';btn.textContent='Continuar';btn.onclick=function(){b.remove();};
+  [t1,t2,t3,t4,btn].forEach(function(el){b.appendChild(el);});
+  document.getElementById('app').appendChild(b);
+}
+function openAdminDirect(){
+  showScreen_auth('main');$('main').style.display='flex';$('main').classList.remove('hidden');
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  $('admin').classList.add('active');
+  CURRENT_USER={id:'admin-direct',nome_completo:'Admin',setor:'Admin',pacotes_disponiveis:0};
+  $('adm-login-wrap').style.display='flex';$('adm-panel').style.display='none';
+  document.querySelectorAll('.dock-btn').forEach(function(b){b.classList.remove('active');});
+  var ab=document.querySelector('[data-screen="admin"]');if(ab)ab.classList.add('active');
+}
+async function admDeleteUser(){
+  var uid=$('adm-del-user-sel').value;if(!uid){toast('Selecione colaborador','error');return;}
+  var user=ALL_USERS.find(function(u){return u.id===uid;});
+  if(!confirm('Excluir conta de '+user.nome_completo+'?')){return;}
+  await db('colecao?usuario_id=eq.'+uid,{method:'DELETE',noparse:true});
+  await db('pacotes?usuario_id=eq.'+uid,{method:'DELETE',noparse:true});
+  await db('missoes_completadas?usuario_id=eq.'+uid,{method:'DELETE',noparse:true});
+  await db('trocas?solicitante_id=eq.'+uid,{method:'DELETE',noparse:true});
+  await db('trocas?destinatario_id=eq.'+uid,{method:'DELETE',noparse:true});
+  await db('usuarios?id=eq.'+uid,{method:'DELETE',noparse:true});
+  ALL_USERS=ALL_USERS.filter(function(u){return u.id!==uid;});
+  admAddLog('Conta de '+user.nome_completo+' excluida');toast('Conta excluida','success');
+  await loadAdminData();
+}
+
 </script>
+</div>
 </body>
 </html>
