@@ -1379,8 +1379,8 @@ function showAlbumComplete(){
   var b=document.createElement('div');b.id='album-complete-banner';
   b.style.cssText='position:fixed;inset:0;background:rgba(8,1,5,0.96);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center';
   var t1=document.createElement('div');t1.style.cssText='font-size:64px;margin-bottom:16px';t1.textContent='🏆';
-  var t2=document.createElement('div');t2.style.cssText='font-size:24px;font-weight:900;color:#c9a84c;margin-bottom:8px';t2.textContent='ALBUM COMPLETO!';
-  var t3=document.createElement('div');t3.style.cssText='font-size:14px;color:rgba(245,240,235,0.45);margin-bottom:32px;line-height:1.6';t3.innerHTML='Voce completou a Selecao Bioflora 2026!<br><br>Fale com a <strong style="color:#c9a84c">Wal</strong> para retirar o seu premio. 🎁';
+  var t2=document.createElement('div');t2.style.cssText='font-size:26px;font-weight:900;color:#c9a84c;margin-bottom:12px';t2.textContent='Parabéns!';
+  var t3=document.createElement('div');t3.style.cssText='font-size:16px;color:rgba(245,240,235,0.7);margin-bottom:32px;line-height:1.6';t3.textContent='Álbum completo! Seleção Bioflora 2026 🇧🇷';
   var t4=document.createElement('div');
   var btn=document.createElement('button');btn.style.cssText='background:linear-gradient(135deg,#e8cc80,#c9a84c);border:none;border-radius:50px;padding:13px 40px;font-family:inherit;font-size:14px;font-weight:900;color:#1a0810;cursor:pointer';btn.textContent='Continuar';btn.onclick=function(){b.remove();};
   [t1,t2,t3,t4,btn].forEach(function(el){b.appendChild(el);});
